@@ -91,10 +91,15 @@ const WEB3FORMS_KEY = '';                   // только для режима 
     const ctx = cv.getContext('2d');
     const hShots = $('#h-shots'), hHits = $('#h-hits'), hAcc = $('#h-acc');
     // относительные координаты: [x, y, w, h]
-    const OB = [[.10, .34, .10, .05], [.30, .56, .04, .17], [.40, .22, .13, .04], [.55, .50, .10, .05], [.70, .20, .04, .15], [.18, .74, .14, .04], [.82, .46, .06, .04]];
-    const TG = [[.22, .22], [.36, .42], [.48, .68], [.62, .32], [.78, .60], [.26, .56], [.86, .26]].map(p => ({ x: p[0], y: p[1], off: 0, flash: 0 }));
+    const R = Math.random;
+    // укрытия медленно «плавают» возле своих мест: bx,by — центр, ax,ay — размах, sp — скорость (рад/с)
+    const OB = [[.10, .34, .10, .05], [.30, .56, .04, .17], [.40, .22, .13, .04], [.55, .50, .10, .05], [.70, .20, .04, .15], [.18, .74, .14, .04], [.82, .46, .06, .04]]
+      .map((o, i) => ({ bx: o[0], by: o[1], w: o[2], h: o[3], x: o[0], y: o[1], ax: i % 2 ? .035 : .012, ay: i % 2 ? .012 : .03, sp: .12 + R() * .1, ph: R() * 6.28 }));
+    // цели дрейфуют с постоянной скоростью (доли поля в секунду) и отскакивают от краёв и укрытий
+    const TG = [[.22, .22], [.36, .42], [.48, .68], [.62, .32], [.78, .60], [.26, .56], [.86, .26]]
+      .map(p => { const a = R() * 6.28, v = .006 + R() * .006; return { x: p[0], y: p[1], vx: Math.cos(a) * v, vy: Math.sin(a) * v, off: 0, flash: 0 }; });
     const OR = [.9, .8];
-    let W = 0, H = 0, dpr = 1, mouse = null, shots = 0, hits = 0, beams = [], sparks = [], lastUser = 0, visible = true, lastAuto = 0;
+    let W = 0, H = 0, dpr = 1, mouse = null, shots = 0, hits = 0, beams = [], sparks = [], lastUser = 0, visible = true, lastAuto = 0, lastT = 0;
     const CELL = 64;
 
     function resize() {
@@ -110,12 +115,26 @@ const WEB3FORMS_KEY = '';                   // только для режима 
     const px = (rx, ry) => [rx * W, ry * H];
     const botEl = $('.hero__bot');
     function origin() { const x = OR[0] * W, lim = botEl ? botEl.offsetTop - 34 : H * .8; return [x, Math.min(OR[1] * H, lim)]; }
-    function inObs(x, y) {
+    function inObs(x, y, pad) {
+      pad = pad || 0;
       for (const o of OB) {
-        const ox = o[0] * W, oy = o[1] * H;
-        if (x >= ox && x <= ox + o[2] * W && y >= oy && y <= oy + o[3] * H) return true;
+        const ox = o.x * W, oy = o.y * H;
+        if (x >= ox - pad && x <= ox + o.w * W + pad && y >= oy - pad && y <= oy + o.h * H + pad) return true;
       }
       return false;
+    }
+    function step(now) {
+      const dt = lastT ? Math.min(.05, (now - lastT) / 1000) : 0; lastT = now;
+      if (reduce) return;
+      const t = now / 1000;
+      for (const o of OB) { o.x = o.bx + o.ax * Math.sin(t * o.sp + o.ph); o.y = o.by + o.ay * Math.cos(t * o.sp * .8 + o.ph); }
+      for (const g of TG) {
+        let nx = g.x + g.vx * dt, ny = g.y + g.vy * dt;
+        if (nx < .04 || nx > .96) { g.vx = -g.vx; nx = g.x; }
+        if (ny < .16 || ny > .82) { g.vy = -g.vy; ny = g.y; }
+        if (!inObs(g.x * W, g.y * H, 10) && inObs(nx * W, ny * H, 10)) { g.vx = -g.vx; g.vy = -g.vy; nx = g.x; ny = g.y; }
+        g.x = nx; g.y = ny;
+      }
     }
     function trace(x0, y0, x1, y1) {
       const dx = x1 - x0, dy = y1 - y0, L = Math.hypot(dx, dy) || 1, ux = dx / L, uy = dy / L;
@@ -158,7 +177,8 @@ const WEB3FORMS_KEY = '';                   // только для режима 
     function text(s, x, y, a) { ctx.fillStyle = 'rgba(235,233,228,' + a + ')'; ctx.fillText(s, x, y); }
 
     function frame(now) {
-      if (!visible) return;
+      if (!visible) { lastT = 0; return; }
+      step(now);
       ctx.clearRect(0, 0, W, H);
       // сетка
       ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(235,233,228,.055)'; ctx.beginPath();
@@ -170,7 +190,7 @@ const WEB3FORMS_KEY = '';                   // только для режима 
       for (let i = 1, y = CELL; y < H; y += CELL, i++) text(String(i + 1).padStart(2, '0'), 6, y + 6, .3);
       // укрытия
       for (const o of OB) {
-        const x = o[0] * W, y = o[1] * H, w = o[2] * W, h = o[3] * H;
+        const x = o.x * W, y = o.y * H, w = o.w * W, h = o.h * H;
         ctx.fillStyle = 'rgba(235,233,228,.045)'; ctx.fillRect(x, y, w, h);
         ctx.strokeStyle = 'rgba(235,233,228,.22)'; ctx.strokeRect(x + .5, y + .5, w, h);
       }
@@ -263,12 +283,16 @@ const WEB3FORMS_KEY = '';                   // только для режима 
       const c = document.createElement('span'); c.className = 'cap';
       c.innerHTML = '<b>' + String(i + 1).padStart(2, '0') + '</b>' + (a.dataset.cap ? ' · ' + a.dataset.cap : '');
       a.appendChild(c);
-      a.addEventListener('pointermove', e => {
-        if (e.pointerType === 'touch') return;
-        const r = a.getBoundingClientRect();
-        a.style.setProperty('--mx', (e.clientX - r.left) + 'px'); a.style.setProperty('--my', (e.clientY - r.top) + 'px');
-      });
-      a.addEventListener('pointerleave', () => { a.style.setProperty('--mx', '-999px'); a.style.setProperty('--my', '-999px'); });
+      const lens = e => {
+        const r = a.getBoundingClientRect(), up = e.pointerType === 'touch' ? 46 : 0;   // на телефоне прицел выше пальца
+        a.style.setProperty('--mx', (e.clientX - r.left) + 'px'); a.style.setProperty('--my', (e.clientY - r.top - up) + 'px');
+      };
+      const off = () => { a.style.setProperty('--mx', '-999px'); a.style.setProperty('--my', '-999px'); };
+      a.addEventListener('pointerdown', lens);
+      a.addEventListener('pointermove', lens);
+      a.addEventListener('pointerleave', off);
+      a.addEventListener('pointercancel', off);
+      a.addEventListener('pointerup', e => { if (e.pointerType === 'touch') setTimeout(off, 350); });
       a.addEventListener('click', e => { e.preventDefault(); openLb(items, i, g.dataset.gal || ''); });
     });
   });
@@ -290,8 +314,9 @@ const WEB3FORMS_KEY = '';                   // только для режима 
       '<button class="lb__a lb__prev" type="button" aria-label="Назад">←</button><figure class="lb__f"><img alt=""></figure><button class="lb__a lb__next" type="button" aria-label="Вперёд">→</button>';
     document.body.appendChild(lb); document.body.classList.add('noscroll');
     const img = $('img', lb), n = $('.lb__n', lb), c = $('.lb__c', lb);
+    let zoomReset = function () {};
     function show(k) {
-      i = (k + items.length) % items.length;
+      i = (k + items.length) % items.length; zoomReset();
       const a = items[i], im = $('img', a);
       img.classList.remove('on');
       img.onload = () => img.classList.add('on');
@@ -320,9 +345,48 @@ const WEB3FORMS_KEY = '';                   // только для режима 
     $('.lb__prev', lb).addEventListener('click', () => show(i - 1));
     $('.lb__next', lb).addEventListener('click', () => show(i + 1));
     lb.addEventListener('click', e => { if (e.target === lb) close(); });
-    let sx = null;
-    lb.addEventListener('touchstart', e => { sx = e.touches[0].clientX; }, { passive: true });
-    lb.addEventListener('touchend', e => { if (sx === null) return; const dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 50) show(i + (dx < 0 ? 1 : -1)); sx = null; });
+    /* масштаб и перемещение: два пальца, колесо мыши, двойное касание; свайп листает только при масштабе 1 */
+    const fig = $('.lb__f', lb);
+    let sc = 1, tx = 0, ty = 0, ptrs = new Map(), d0 = 0, sc0 = 1, sx = 0, sy = 0, lastTap = 0, lastTouch = 0, moved = false;
+    function apply() {
+      const mx = Math.max(0, (img.clientWidth * sc - fig.clientWidth) / 2), my = Math.max(0, (img.clientHeight * sc - fig.clientHeight) / 2);
+      tx = Math.max(-mx, Math.min(mx, tx)); ty = Math.max(-my, Math.min(my, ty));
+      img.style.transform = sc === 1 ? '' : 'translate(' + tx + 'px,' + ty + 'px) scale(' + sc + ')';
+      fig.classList.toggle('zoomed', sc > 1);
+    }
+    function reset() { sc = 1; tx = 0; ty = 0; apply(); }
+    function dist() { const p = Array.from(ptrs.values()); return Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y); }
+    fig.addEventListener('pointerdown', e => {
+      fig.setPointerCapture(e.pointerId); ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (ptrs.size === 2) { d0 = dist(); sc0 = sc; }
+      sx = e.clientX; sy = e.clientY; moved = false;
+    });
+    fig.addEventListener('pointermove', e => {
+      const p = ptrs.get(e.pointerId); if (!p) return;
+      const dx = e.clientX - p.x, dy = e.clientY - p.y; p.x = e.clientX; p.y = e.clientY;
+      if (Math.abs(e.clientX - sx) + Math.abs(e.clientY - sy) > 8) moved = true;
+      if (ptrs.size === 2) { sc = Math.max(1, Math.min(5, sc0 * dist() / d0)); if (sc === 1) { tx = 0; ty = 0; } apply(); }
+      else if (sc > 1) { tx += dx; ty += dy; apply(); }
+    });
+    function up(e) {
+      const had = ptrs.delete(e.pointerId);
+      if (!had) return;
+      if (ptrs.size === 1) { const r = Array.from(ptrs.values())[0]; sx = r.x; sy = r.y; }
+      if (ptrs.size === 0 && e.type === 'pointerup') {
+        if (e.pointerType === 'touch') lastTouch = Date.now();
+        const dx = e.clientX - sx;
+        if (sc === 1 && e.pointerType === 'touch' && Math.abs(dx) > 50 && Math.abs(e.clientY - sy) < 80) show(i + (dx < 0 ? 1 : -1));
+        else if (!moved && e.pointerType === 'touch') {
+          const now = Date.now();
+          if (now - lastTap < 300) { if (sc > 1) reset(); else { sc = 2.5; apply(); } lastTap = 0; } else lastTap = now;
+        }
+      }
+    }
+    fig.addEventListener('pointerup', up); fig.addEventListener('pointercancel', up);
+    fig.addEventListener('dblclick', () => { if (Date.now() - lastTouch < 800) return; if (sc > 1) reset(); else { sc = 2.5; apply(); } });
+    fig.addEventListener('wheel', e => { e.preventDefault(); sc = Math.max(1, Math.min(5, sc * (e.deltaY < 0 ? 1.15 : .87))); if (sc === 1) { tx = 0; ty = 0; } apply(); }, { passive: false });
+    img.addEventListener('load', reset);
+    zoomReset = reset;
     show(i); $('.lb__x', lb).focus();
   }
 

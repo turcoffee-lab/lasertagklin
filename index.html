@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500&display=swap&subset=cyrillic">
-<link rel="stylesheet" href="style.css?v=6">
+<link rel="stylesheet" href="style.css?v=3">
 <script>document.documentElement.classList.add('js')</script>
 <script type="application/ld+json">
 {
@@ -67,7 +67,7 @@
       <a class="btn" href="#contact">Записаться на игру</a>
       <a class="btn btn--ghost" href="#polygons">Полигоны</a>
     </div>
-    <p class="hint">[ нажмите в поле — выстрел. Укрытия держат луч ]</p>
+    <p class="hint">[ нажмите в поле — выстрел. Цели и укрытия движутся, укрытия держат луч ]</p>
   </div>
   <div class="wrap hero__bot">
     <dl class="stats">
@@ -103,7 +103,7 @@
         <div class="loc" role="tabpanel" id="loc-NEW" aria-labelledby="t-NEW">
           <header class="loc__head"><h3 class="loc__name">Название</h3><p class="loc__lead">Одна-две фразы о локации.</p></header>
           <div class="galw">
-            <div class="gal-tools"><span class="hint-fine">[ наведите: прицел проявляет кадр. Клик: открыть ]</span><span class="hint-touch">[ нажмите на кадр, чтобы открыть ]</span><button class="gal-mode" type="button" aria-pressed="false">Показать в цвете</button></div>
+            <div class="gal-tools"><span class="hint-fine">[ наведите: прицел проявляет кадр. Клик: открыть ]</span><span class="hint-touch">[ ведите пальцем по кадру: прицел проявляет его. Касание: открыть ]</span><button class="gal-mode" type="button" aria-pressed="false">Показать в цвете</button></div>
             <ul class="gal" data-gal="Название">
               <li class="w2 h2"><a href="img/new-01.jpg"><img src="img/new-01.jpg" alt="Описание фото" loading="lazy"></a></li>
               <li><a href="img/new-02.jpg"><img src="img/new-02.jpg" alt="Описание фото" loading="lazy"></a></li>
@@ -135,7 +135,7 @@
           </header>
 
           <div class="galw">
-            <div class="gal-tools"><span class="hint-fine">[ наведите: прицел проявляет кадр. Клик: открыть ]</span><span class="hint-touch">[ нажмите на кадр, чтобы открыть ]</span><button class="gal-mode" type="button" aria-pressed="false">Показать в цвете</button></div>
+            <div class="gal-tools"><span class="hint-fine">[ наведите: прицел проявляет кадр. Клик: открыть ]</span><span class="hint-touch">[ ведите пальцем по кадру: прицел проявляет его. Касание: открыть ]</span><button class="gal-mode" type="button" aria-pressed="false">Показать в цвете</button></div>
             <!-- ЗАМЕНИТЬ: фото-заглушки на реальные снимки Бункера 13 (img/bunker-01.jpg ... ) -->
             <ul class="gal" data-gal="Бункер 13">
               <li class="w2 h2"><a href="img/bunker-01.jpg" data-cap="полигон"><img src="img/bunker-01.jpg" alt="Фото: Бункер 13, полигон" loading="lazy"></a></li>
@@ -144,8 +144,6 @@
               <li class="w2"><a href="img/bunker-04.jpg" data-cap="Штаб"><img src="img/bunker-04.jpg" alt="Фото: Штаб" loading="lazy"></a></li>
               <li class="w2"><a href="img/bunker-05.jpg"><img src="img/bunker-05.jpg" alt="Фото: Бункер 13" loading="lazy"></a></li>
               <li class="w2"><a href="img/bunker-06.jpg"><img src="img/bunker-06.jpg" alt="Фото: Бункер 13" loading="lazy"></a></li>
-			  <li><a href="img/davydkovo-02.jpg"><img src="img/davydkovo-02.jpg" alt="Фото: Давыдково Family" loading="lazy"></a></li>
-              <li><a href="img/davydkovo-03.jpg"><img src="img/davydkovo-03.jpg" alt="Фото: Давыдково Family" loading="lazy"></a></li>
             </ul>
           </div>
 
@@ -187,7 +185,7 @@
           </header>
 
           <div class="galw">
-            <div class="gal-tools"><span class="hint-fine">[ наведите: прицел проявляет кадр. Клик: открыть ]</span><span class="hint-touch">[ нажмите на кадр, чтобы открыть ]</span><button class="gal-mode" type="button" aria-pressed="false">Показать в цвете</button></div>
+            <div class="gal-tools"><span class="hint-fine">[ наведите: прицел проявляет кадр. Клик: открыть ]</span><span class="hint-touch">[ ведите пальцем по кадру: прицел проявляет его. Касание: открыть ]</span><button class="gal-mode" type="button" aria-pressed="false">Показать в цвете</button></div>
             <!-- ЗАМЕНИТЬ: фото-заглушки на реальные снимки Давыдково (img/davydkovo-01.jpg ... ) -->
             <ul class="gal" data-gal="Давыдково Family">
               <li class="w2 h2"><a href="img/davydkovo-01.jpg" data-cap="полигон"><img src="img/davydkovo-01.jpg" alt="Фото: Давыдково Family, полигон" loading="lazy"></a></li>
@@ -277,7 +275,7 @@
         <div class="loc" role="tabpanel" id="loc-ultra" aria-labelledby="t-ultra">
           <header class="loc__head"><h3 class="loc__name">База отдыха «Ультра»</h3><p class="loc__lead">ЗАМЕНИТЬ: описание локации.</p></header>
           <div class="galw">
-            <div class="gal-tools"><span class="hint-fine">[ наведите: прицел проявляет кадр. Клик: открыть ]</span><span class="hint-touch">[ нажмите на кадр, чтобы открыть ]</span><button class="gal-mode" type="button" aria-pressed="false">Показать в цвете</button></div>
+            <div class="gal-tools"><span class="hint-fine">[ наведите: прицел проявляет кадр. Клик: открыть ]</span><span class="hint-touch">[ ведите пальцем по кадру: прицел проявляет его. Касание: открыть ]</span><button class="gal-mode" type="button" aria-pressed="false">Показать в цвете</button></div>
             <ul class="gal" data-gal="База отдыха Ультра">
               <li class="w2 h2"><a href="img/ultra-01.jpg"><img src="img/ultra-01.jpg" alt="Фото: база отдыха Ультра" loading="lazy"></a></li>
             </ul>
@@ -290,7 +288,7 @@
         <div class="loc" role="tabpanel" id="loc-psy" aria-labelledby="t-psy">
           <header class="loc__head"><h3 class="loc__name">Психбольница 666</h3><p class="loc__lead">Тематическая локация, 12+. ЗАМЕНИТЬ: описание.</p></header>
           <div class="galw">
-            <div class="gal-tools"><span class="hint-fine">[ наведите: прицел проявляет кадр. Клик: открыть ]</span><span class="hint-touch">[ нажмите на кадр, чтобы открыть ]</span><button class="gal-mode" type="button" aria-pressed="false">Показать в цвете</button></div>
+            <div class="gal-tools"><span class="hint-fine">[ наведите: прицел проявляет кадр. Клик: открыть ]</span><span class="hint-touch">[ ведите пальцем по кадру: прицел проявляет его. Касание: открыть ]</span><button class="gal-mode" type="button" aria-pressed="false">Показать в цвете</button></div>
             <ul class="gal" data-gal="Психбольница 666">
               <li class="w2 h2"><a href="img/psy-01.jpg"><img src="img/psy-01.jpg" alt="Фото: Психбольница 666" loading="lazy"></a></li>
             </ul>
@@ -456,6 +454,6 @@
   </div>
 </footer>
 
-<script src="main.js?v=6"></script>
+<script src="main.js?v=3"></script>
 </body>
 </html>
