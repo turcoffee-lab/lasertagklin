@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Лазертаг-клуб «Клинский» — Клин, Солнечногорск</title>
+<meta name="description" content="Клуб лазертага «Клинский»: четыре полигона, оборудование Laserwar 10 поколения, секция для детей от 7 лет, праздники, корпоративы и игры на выезд. Клин, Солнечногорск.">
+<meta name="theme-color" content="#0a0b0c">
+<!-- ТЕСТОВЫЙ РЕЖИМ: перед запуском удалить следующую строку (и вернуть robots.txt) -->
+<meta name="robots" content="noindex, nofollow">
+<meta property="og:title" content="Лазертаг-клуб «Клинский»">
+<meta property="og:description" content="Четыре полигона, Laserwar 10 поколения, секция 7+, игры на выезд. Клин, Солнечногорск.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ru_RU">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500&display=swap&subset=cyrillic">
+<link rel="stylesheet" href="style.css?v=1">
+<script>document.documentElement.classList.add('js')</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SportsActivityLocation",
+  "name": "Лазертаг-клуб «Клинский»",
+  "description": "Клуб лазертага: полигоны, секция 7+, праздники, корпоративы, игры на выезд.",
+  "telephone": "+7-977-316-15-16",
+  "areaServed": ["Клин", "Солнечногорск"],
+  "sameAs": ["https://vk.ru/lasertagklin", "https://vk.ru/klinskiy_1"]
+}
+</script>
+</head>
+<body id="top">
+
+<header class="bar">
+  <a class="logo" href="#top" aria-label="Клинский — наверх">
+    <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><rect x="1" y="1" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="1.6" fill="#ff4a1c"/><path d="M12 1v5M12 18v5M1 12h5M18 12h5" stroke="currentColor" stroke-width="1.5"/></svg>
+    <span class="logo__t">Клинский</span><span class="logo__s">lasertag club</span>
+  </a>
+  <nav class="nav" id="nav" aria-label="Разделы">
+    <a href="#polygons">Полигоны</a>
+    <a href="#gear">Оборудование</a>
+    <a href="#formats">Форматы</a>
+    <a href="#hq">Штаб</a>
+    <a href="#contact" class="nav__cta">Записаться</a>
+  </nav>
+  <a class="btn btn--sm bar__btn" href="#contact">Записаться</a>
+  <button class="burger" type="button" aria-label="Меню" aria-expanded="false" aria-controls="nav"><span></span><span></span></button>
+  <i class="bar__p" aria-hidden="true"></i>
+</header>
+
+<main>
+
+<!-- ============ ГЛАВНЫЙ ЭКРАН ============ -->
+<section class="hero" id="hero">
+  <canvas id="field" aria-hidden="true"></canvas>
+  <div class="hud" aria-hidden="true">
+    <div><span>Выстрелов</span><b id="h-shots">0</b></div>
+    <div><span>Попаданий</span><b id="h-hits">0</b></div>
+    <div><span>Точность</span><b id="h-acc">—</b></div>
+  </div>
+  <div class="wrap hero__in">
+    <p class="eyebrow">Клуб лазертага · Клин / Солнечногорск</p>
+    <h1><span>Лазертаг</span><span>Клинский<i>.</i></span></h1>
+    <p class="lead">Четыре полигона, оборудование Laserwar 10 поколения, секция для детей от 7 лет, игры на выезд.</p>
+    <div class="cta">
+      <a class="btn" href="#contact">Записаться на игру</a>
+      <a class="btn btn--ghost" href="#polygons">Полигоны</a>
+    </div>
+    <p class="hint">[ нажмите в поле — выстрел. Укрытия держат луч ]</p>
+  </div>
+  <div class="wrap hero__bot">
+    <dl class="stats">
+      <div><dt>лет организуем игры</dt><dd><span data-count="10">10</span>+</dd></div>
+      <div><dt>полигона</dt><dd><span data-count="4">4</span></dd></div>
+      <div><dt>возраст секции</dt><dd><span data-count="7">7</span>+</dd></div>
+      <div><dt>поколение Laserwar</dt><dd><span data-count="10">10</span></dd></div>
+    </dl>
+  </div>
+</section>
+
+<!-- ============ 01 ПОЛИГОНЫ ============ -->
+<section class="sec" id="polygons">
+  <div class="wrap">
+    <header class="sec__head rv">
+      <p class="idx"><b>01</b> / полигоны</p>
+      <h2>Четыре полигона</h2>
+    </header>
+
+    <div class="locs rv">
+      <div class="loc-tabs" role="tablist" aria-label="Полигоны">
+        <button class="loc-tab" role="tab" id="t1" aria-controls="loc1" type="button"><b>01</b><span>Бункер 13</span><em>помещение + улица</em></button>
+        <button class="loc-tab" role="tab" id="t2" aria-controls="loc2" type="button"><b>02</b><span>База отдыха «Ультра»</span><em>база отдыха</em></button>
+        <button class="loc-tab" role="tab" id="t3" aria-controls="loc3" type="button"><b>03</b><span>Давыдково Family</span><em>площадка</em></button>
+        <button class="loc-tab" role="tab" id="t4" aria-controls="loc4" type="button"><b>04</b><span>Психбольница 666</span><em>12+</em></button>
+      </div>
+
+      <div class="loc-body">
+        <div class="loc" role="tabpanel" id="loc1" aria-labelledby="t1">
+          <div class="plan" data-seed="13" data-kind="bunker" role="img" aria-label="Условная схема полигона «Бункер 13»"></div>
+          <p class="plan__cap">Условная схема · <span class="todo">заменить реальным планом</span></p>
+          <dl class="spec">
+            <div><dt>Среда</dt><dd>Тёплое помещение и открытая площадка</dd></div>
+            <div><dt>Укрытия</dt><dd>Доты, окопы, крепости</dd></div>
+            <div><dt>Удобства</dt><dd>Вода, отопление, зона ожидания</dd></div>
+            <div><dt>Возраст</dt><dd><span class="todo">уточнить</span></dd></div>
+          </dl>
+        </div>
+        <div class="loc" role="tabpanel" id="loc2" aria-labelledby="t2">
+          <div class="plan" data-seed="42" data-kind="open" role="img" aria-label="Условная схема полигона на базе «Ультра»"></div>
+          <p class="plan__cap">Условная схема · <span class="todo">заменить реальным планом</span></p>
+          <dl class="spec">
+            <div><dt>Тип</dt><dd>База отдыха</dd></div>
+            <div><dt>Среда</dt><dd><span class="todo">уточнить</span></dd></div>
+            <div><dt>Укрытия</dt><dd><span class="todo">уточнить</span></dd></div>
+            <div><dt>Возраст</dt><dd><span class="todo">уточнить</span></dd></div>
+          </dl>
+        </div>
+        <div class="loc" role="tabpanel" id="loc3" aria-labelledby="t3">
+          <div class="plan" data-seed="7" data-kind="mix" role="img" aria-label="Условная схема полигона «Давыдково Family»"></div>
+          <p class="plan__cap">Условная схема · <span class="todo">заменить реальным планом</span></p>
+          <dl class="spec">
+            <div><dt>Тип</dt><dd><span class="todo">уточнить</span></dd></div>
+            <div><dt>Среда</dt><dd><span class="todo">уточнить</span></dd></div>
+            <div><dt>Укрытия</dt><dd><span class="todo">уточнить</span></dd></div>
+            <div><dt>Возраст</dt><dd><span class="todo">уточнить</span></dd></div>
+          </dl>
+        </div>
+        <div class="loc" role="tabpanel" id="loc4" aria-labelledby="t4">
+          <div class="plan" data-seed="666" data-kind="rooms" role="img" aria-label="Условная схема локации «Психбольница 666»"></div>
+          <p class="plan__cap">Условная схема · <span class="todo">заменить реальным планом</span></p>
+          <dl class="spec">
+            <div><dt>Возраст</dt><dd>12+</dd></div>
+            <div><dt>Формат</dt><dd>Тематическая локация</dd></div>
+            <div><dt>Среда</dt><dd><span class="todo">уточнить</span></dd></div>
+            <div><dt>Сценарий</dt><dd><span class="todo">уточнить</span></dd></div>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 02 ОБОРУДОВАНИЕ ============ -->
+<section class="sec" id="gear">
+  <div class="wrap">
+    <header class="sec__head rv">
+      <p class="idx"><b>02</b> / оборудование</p>
+      <h2>Как устроена система</h2>
+    </header>
+
+    <ol class="chain rv">
+      <li><b>Выстрел</b><span>Игрок стреляет из тагера</span></li>
+      <li><b>ИК-луч</b><span>Инфракрасный луч, без снарядов</span></li>
+      <li><b>Датчик</b><span>Датчик на игроке принимает луч</span></li>
+      <li><b>Фиксация</b><span>Попадание засчитывается автоматически</span></li>
+    </ol>
+
+    <div class="gear rv">
+      <div class="mech">
+        <h3>В игре нужно</h3>
+        <ul>
+          <li><b>Жизни</b><span>пополнять по ходу игры</span></li>
+          <li><b>Перезарядка</b><span>перезаряжаться вовремя</span></li>
+          <li><b>Задания</b><span>выполнять командные боевые задания и квесты</span></li>
+        </ul>
+      </div>
+      <div class="ledger-wrap">
+        <h3>Комплектация</h3>
+        <table class="ledger">
+          <thead><tr><th>№</th><th>Позиция</th><th>Группа</th></tr></thead>
+          <tbody>
+            <tr><td>01</td><td>Laserwar, 10 поколение</td><td>Оборудование</td></tr>
+            <tr><td>02</td><td>Тагер «Хищник»</td><td>Тагер</td></tr>
+            <tr><td>03</td><td>Тагер «Шершень»</td><td>Тагер</td></tr>
+            <tr><td>04</td><td>Тагер «Ратник»</td><td>Тагер</td></tr>
+            <tr><td>05</td><td>Лазерный тир</td><td>Тир</td></tr>
+            <tr><td>06</td><td>Контрольные точки</td><td>Игровые элементы</td></tr>
+            <tr><td>07</td><td>Аптечки</td><td>Игровые элементы</td></tr>
+            <tr><td>08</td><td>Гранаты</td><td>Игровые элементы</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 03 ФОРМАТЫ ============ -->
+<section class="sec" id="formats">
+  <div class="wrap">
+    <header class="sec__head rv">
+      <p class="idx"><b>03</b> / форматы</p>
+      <h2>Форматы</h2>
+    </header>
+
+    <ul class="rows rv">
+      <li><a class="row" href="#contact" data-type="Секция 7+"><b>01</b><strong>Секция</strong><span>Регулярные занятия для детей</span><em>7+</em><i aria-hidden="true">→</i></a></li>
+      <li><a class="row" href="#contact" data-type="День рождения"><b>02</b><strong>День рождения</strong><span>Игра для детей и взрослых</span><em></em><i aria-hidden="true">→</i></a></li>
+      <li><a class="row" href="#contact" data-type="Корпоратив"><b>03</b><strong>Корпоратив</strong><span>Командная игра с заданиями</span><em></em><i aria-hidden="true">→</i></a></li>
+      <li><a class="row" href="#contact" data-type="Выпускной"><b>04</b><strong>Выпускной</strong><span>Игра для класса или группы</span><em></em><i aria-hidden="true">→</i></a></li>
+      <li><a class="row" href="#contact" data-type="Тематический квест"><b>05</b><strong>Квесты и сценарии</strong><span>Тематические сценарии, квесты, хорроры, актёры</span><em></em><i aria-hidden="true">→</i></a></li>
+      <li><a class="row" href="#contact" data-type="Игра на выезд"><b>06</b><strong>На выезд</strong><span>Привезём оборудование в любое время года</span><em></em><i aria-hidden="true">→</i></a></li>
+      <li><a class="row" href="#contact" data-type="Сотрудничество"><b>07</b><strong>Партнёрам</strong><span>Площадки, базы отдыха, агентства праздников. Бартер, взаимная реклама</span><em></em><i aria-hidden="true">→</i></a></li>
+    </ul>
+
+    <div class="extras rv">
+      <p class="mono">К игре можно добавить (зависит от площадки)</p>
+      <ul class="chips">
+        <li>Барбекю</li><li>Бассейн</li><li>Мини-ферма</li><li>Рыбалка</li><li>Шоу и диско</li><li>Мастер-классы</li><li>Фото и рилс</li><li>Застолье в Штабе</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 04 ШТАБ И ВЫЕЗД ============ -->
+<section class="sec" id="hq">
+  <div class="wrap">
+    <header class="sec__head rv">
+      <p class="idx"><b>04</b> / штаб и выезд</p>
+      <h2>Штаб и выезд</h2>
+    </header>
+
+    <div class="duo rv">
+      <article class="card card--hq">
+        <span class="card__ghost" aria-hidden="true">ШТАБ</span>
+        <h3>Штаб</h3>
+        <p>Мини-музей с подлинными вещами ушедших эпох. Зал с реквизитом и раритетами, предметы времён Великой Отечественной войны. Здесь же проходит застолье после игры.</p>
+        <p class="plan__cap"><span class="todo">добавить фото штаба</span></p>
+      </article>
+      <article class="card card--road">
+        <h3>На выезд</h3>
+        <p>Если вы не едете к нам, приезжаем сами. Проходимая Нива с полным комплектом оборудования доберётся до любого места, в любое время года.</p>
+        <svg class="route" viewBox="0 0 400 90" aria-hidden="true"><path d="M8 70 C 80 70, 90 20, 170 28 S 290 78, 392 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 6"/><rect x="2" y="64" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="392" cy="18" r="6" fill="none" stroke="#ff4a1c" stroke-width="1.5"/><circle cx="392" cy="18" r="1.8" fill="#ff4a1c"/></svg>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 05 ЗАЯВКА ============ -->
+<section class="sec" id="contact">
+  <div class="wrap">
+    <header class="sec__head rv">
+      <p class="idx"><b>05</b> / заявка</p>
+      <h2>Записаться на игру</h2>
+    </header>
+
+    <div class="contact rv">
+      <div class="contact__info">
+        <a class="phone" href="tel:+79773161516">8 (977) 316-15-16</a>
+        <ul class="links">
+          <li><span>ВКонтакте</span><a href="https://vk.ru/lasertagklin" rel="noopener" target="_blank">vk.ru/lasertagklin</a></li>
+          <li><span>ВКонтакте</span><a href="https://vk.ru/klinskiy_1" rel="noopener" target="_blank">vk.ru/klinskiy_1</a></li>
+          <li><span>Сайт</span><b><span class="todo">домен</span></b></li>
+          <li><span>Район</span><b>Клин · Солнечногорск</b></li>
+        </ul>
+      </div>
+
+      <form class="form" id="form" novalidate>
+        <label>Имя<input name="name" type="text" autocomplete="name" required maxlength="100"></label>
+        <label>Телефон или Email<input name="contact" type="text" autocomplete="tel" required maxlength="150"></label>
+        <label>Что интересует
+          <select name="type" id="f-type">
+            <option>День рождения</option>
+            <option>Секция 7+</option>
+            <option>Корпоратив</option>
+            <option>Выпускной</option>
+            <option>Тематический квест</option>
+            <option>Игра на выезд</option>
+            <option>Сотрудничество</option>
+            <option>Другое</option>
+          </select>
+        </label>
+        <label>Сообщение<textarea name="message" rows="3" maxlength="3000" placeholder="Дата, возраст, число участников"></textarea></label>
+        <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <label class="check"><input type="checkbox" name="consent" required><span>Согласен на обработку персональных данных. <a href="privacy.html" target="_blank" rel="noopener">Политика</a></span></label>
+        <button class="btn" type="submit">Отправить заявку</button>
+        <p class="fstatus" id="fstatus" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap foot__in">
+    <p>© Клуб лазертага «Клинский»</p>
+    <a href="#top">Наверх ↑</a>
+  </div>
+</footer>
+
+<script src="main.js?v=1"></script>
+</body>
+</html>
