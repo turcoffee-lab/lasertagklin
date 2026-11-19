@@ -4,19 +4,19 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Лазертаг-клуб «Клинский» — Клин, Солнечногорск</title>
-<meta name="description" content="Клуб лазертага «Клинский»: четыре полигона, оборудование Laserwar 10 поколения, секция для детей от 7 лет, праздники, корпоративы и игры на выезд. Клин, Солнечногорск.">
+<meta name="description" content="Клуб лазертага «Клинский»: полигоны, оборудование Laserwar 10 поколения, секция для детей от 7 лет, праздники, корпоративы и игры на выезд. Клин, Солнечногорск.">
 <meta name="theme-color" content="#0a0b0c">
 <!-- ТЕСТОВЫЙ РЕЖИМ: перед запуском удалить следующую строку (и вернуть robots.txt) -->
 <meta name="robots" content="noindex, nofollow">
 <meta property="og:title" content="Лазертаг-клуб «Клинский»">
-<meta property="og:description" content="Четыре полигона, Laserwar 10 поколения, секция 7+, игры на выезд. Клин, Солнечногорск.">
+<meta property="og:description" content="Полигоны, Laserwar 10 поколения, секция 7+, игры на выезд. Клин, Солнечногорск.">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="ru_RU">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500&display=swap&subset=cyrillic">
-<link rel="stylesheet" href="style.css?v=1">
+<link rel="stylesheet" href="style.css?v=4">
 <script>document.documentElement.classList.add('js')</script>
 <script type="application/ld+json">
 {
@@ -41,7 +41,7 @@
     <a href="#polygons">Полигоны</a>
     <a href="#gear">Оборудование</a>
     <a href="#formats">Форматы</a>
-    <a href="#hq">Штаб</a>
+    <a href="#trip">Выезд</a>
     <a href="#contact" class="nav__cta">Записаться</a>
   </nav>
   <a class="btn btn--sm bar__btn" href="#contact">Записаться</a>
@@ -62,7 +62,7 @@
   <div class="wrap hero__in">
     <p class="eyebrow">Клуб лазертага · Клин / Солнечногорск</p>
     <h1><span>Лазертаг</span><span>Клинский<i>.</i></span></h1>
-    <p class="lead">Четыре полигона, оборудование Laserwar 10 поколения, секция для детей от 7 лет, игры на выезд.</p>
+    <p class="lead">Оборудование Laserwar 10 поколения, секция для детей от 7 лет, игры на полигонах и на выезд.</p>
     <div class="cta">
       <a class="btn" href="#contact">Записаться на игру</a>
       <a class="btn btn--ghost" href="#polygons">Полигоны</a>
@@ -72,7 +72,8 @@
   <div class="wrap hero__bot">
     <dl class="stats">
       <div><dt>лет организуем игры</dt><dd><span data-count="10">10</span>+</dd></div>
-      <div><dt>полигона</dt><dd><span data-count="4">4</span></dd></div>
+      <!-- Число полигонов считается само по количеству вкладок в разделе «Полигоны» -->
+      <div><dt id="stat-locs-l">полигона</dt><dd><span data-count="2" id="stat-locs">2</span></dd></div>
       <div><dt>возраст секции</dt><dd><span data-count="7">7</span>+</dd></div>
       <div><dt>поколение Laserwar</dt><dd><span data-count="10">10</span></dd></div>
     </dl>
@@ -84,58 +85,220 @@
   <div class="wrap">
     <header class="sec__head rv">
       <p class="idx"><b>01</b> / полигоны</p>
-      <h2>Четыре полигона</h2>
+      <h2>Полигоны</h2>
     </header>
 
     <div class="locs rv">
+      <!--
+        КАК ДОБАВИТЬ НОВУЮ ЛОКАЦИЮ (3 шага):
+        1. Скопируйте блок «Шаблон вкладки» ниже и вставьте его в конец списка вкладок.
+        2. Скопируйте блок «Шаблон панели» и вставьте его в конец списка панелей.
+        3. В обоих блоках замените слово NEW на одно и то же короткое имя латиницей (например ultra).
+        Число полигонов в шапке обновится само.
+
+        Шаблон вкладки:
+        <button class="loc-tab" role="tab" id="t-NEW" aria-controls="loc-NEW" type="button"><b>03</b><span>Название</span><em>короткая пометка</em></button>
+
+        Шаблон панели:
+        <div class="loc" role="tabpanel" id="loc-NEW" aria-labelledby="t-NEW">
+          <header class="loc__head"><h3 class="loc__name">Название</h3><p class="loc__lead">Одна-две фразы о локации.</p></header>
+          <div class="galw">
+            <div class="gal-tools"><span class="hint-fine">[ наведите: прицел проявляет кадр. Клик: открыть ]</span><span class="hint-touch">[ нажмите на кадр, чтобы открыть ]</span><button class="gal-mode" type="button" aria-pressed="false">Показать в цвете</button></div>
+            <ul class="gal" data-gal="Название">
+              <li class="w2 h2"><a href="img/new-01.jpg"><img src="img/new-01.jpg" alt="Описание фото" loading="lazy"></a></li>
+              <li><a href="img/new-02.jpg"><img src="img/new-02.jpg" alt="Описание фото" loading="lazy"></a></li>
+            </ul>
+          </div>
+          <div class="loc__cols">
+            <section class="svc"><h4>Заголовок группы</h4><ul><li>Пункт</li><li>Пункт</li></ul></section>
+          </div>
+        </div>
+
+        Классы плиток фото: w2 = в два раза шире, h2 = в два раза выше, без класса = обычная.
+      -->
       <div class="loc-tabs" role="tablist" aria-label="Полигоны">
-        <button class="loc-tab" role="tab" id="t1" aria-controls="loc1" type="button"><b>01</b><span>Бункер 13</span><em>помещение + улица</em></button>
-        <button class="loc-tab" role="tab" id="t2" aria-controls="loc2" type="button"><b>02</b><span>База отдыха «Ультра»</span><em>база отдыха</em></button>
-        <button class="loc-tab" role="tab" id="t3" aria-controls="loc3" type="button"><b>03</b><span>Давыдково Family</span><em>площадка</em></button>
-        <button class="loc-tab" role="tab" id="t4" aria-controls="loc4" type="button"><b>04</b><span>Психбольница 666</span><em>12+</em></button>
+        <button class="loc-tab" role="tab" id="t-bunker" aria-controls="loc-bunker" type="button"><b>01</b><span>Бункер 13</span><em>помещение + улица</em></button>
+        <button class="loc-tab" role="tab" id="t-dav" aria-controls="loc-dav" type="button"><b>02</b><span>Давыдково Family</span><em>семейный комплекс</em></button>
+        <!-- Временно скрыто (чтобы вернуть: удалить эту строку-комментарий вокруг кнопки)
+        <button class="loc-tab" role="tab" id="t-ultra" aria-controls="loc-ultra" type="button"><b>03</b><span>База отдыха «Ультра»</span><em>база отдыха</em></button>
+        <button class="loc-tab" role="tab" id="t-psy" aria-controls="loc-psy" type="button"><b>04</b><span>Психбольница 666</span><em>12+</em></button>
+        -->
       </div>
 
       <div class="loc-body">
-        <div class="loc" role="tabpanel" id="loc1" aria-labelledby="t1">
-          <div class="plan" data-seed="13" data-kind="bunker" role="img" aria-label="Условная схема полигона «Бункер 13»"></div>
-          <p class="plan__cap">Условная схема · <span class="todo">заменить реальным планом</span></p>
-          <dl class="spec">
-            <div><dt>Среда</dt><dd>Тёплое помещение и открытая площадка</dd></div>
-            <div><dt>Укрытия</dt><dd>Доты, окопы, крепости</dd></div>
-            <div><dt>Удобства</dt><dd>Вода, отопление, зона ожидания</dd></div>
-            <div><dt>Возраст</dt><dd><span class="todo">уточнить</span></dd></div>
+
+        <!-- ---------- Бункер 13 ---------- -->
+        <div class="loc" role="tabpanel" id="loc-bunker" aria-labelledby="t-bunker">
+          <header class="loc__head">
+            <h3 class="loc__name">Бункер 13</h3>
+            <p class="loc__lead">Тематическая просторная локация внутри тёплого помещения и площадка под открытым небом.</p>
+          </header>
+
+          <div class="galw">
+            <div class="gal-tools"><span class="hint-fine">[ наведите: прицел проявляет кадр. Клик: открыть ]</span><span class="hint-touch">[ нажмите на кадр, чтобы открыть ]</span><button class="gal-mode" type="button" aria-pressed="false">Показать в цвете</button></div>
+            <!-- ЗАМЕНИТЬ: фото-заглушки на реальные снимки Бункера 13 (img/bunker-01.jpg ... ) -->
+            <ul class="gal" data-gal="Бункер 13">
+              <li class="w2 h2"><a href="img/bunker-01.jpg" data-cap="полигон"><img src="img/bunker-01.jpg" alt="Фото: Бункер 13, полигон" loading="lazy"></a></li>
+              <li><a href="img/bunker-02.jpg"><img src="img/bunker-02.jpg" alt="Фото: Бункер 13" loading="lazy"></a></li>
+              <li><a href="img/bunker-03.jpg"><img src="img/bunker-03.jpg" alt="Фото: Бункер 13" loading="lazy"></a></li>
+              <li class="w2"><a href="img/bunker-04.jpg" data-cap="Штаб"><img src="img/bunker-04.jpg" alt="Фото: Штаб" loading="lazy"></a></li>
+              <li class="w2"><a href="img/bunker-05.jpg"><img src="img/bunker-05.jpg" alt="Фото: Бункер 13" loading="lazy"></a></li>
+              <li class="w2"><a href="img/bunker-06.jpg"><img src="img/bunker-06.jpg" alt="Фото: Бункер 13" loading="lazy"></a></li>
+            </ul>
+          </div>
+
+          <div class="loc__cols">
+            <section class="svc">
+              <h4>Полигон</h4>
+              <ul>
+                <li>Тёплое помещение и открытая площадка</li>
+                <li>Укрытия: доты, окопы, крепости</li>
+                <li>Тематическое оформление</li>
+              </ul>
+            </section>
+            <section class="svc">
+              <h4>Удобства</h4>
+              <ul>
+                <li>Вода</li>
+                <li>Отопление</li>
+                <li>Зона ожидания / гостевая</li>
+              </ul>
+            </section>
+            <section class="svc svc--hq">
+              <h4>Штаб</h4>
+              <p>Мини-музей с подлинными вещами ушедших эпох. Зал с реквизитом и раритетами, предметы времён Великой Отечественной войны. Здесь же проходит застолье после игры.</p>
+            </section>
+          </div>
+
+          <dl class="facts">
+            <div><dt>Телефон</dt><dd><a href="tel:+79773161516">8 (977) 316-15-16</a></dd></div>
+            <div><dt>Адрес</dt><dd><span class="todo">добавить адрес</span></dd></div>
+            <div><dt>Стоимость</dt><dd><span class="todo">добавить цены</span></dd></div>
           </dl>
         </div>
-        <div class="loc" role="tabpanel" id="loc2" aria-labelledby="t2">
-          <div class="plan" data-seed="42" data-kind="open" role="img" aria-label="Условная схема полигона на базе «Ультра»"></div>
-          <p class="plan__cap">Условная схема · <span class="todo">заменить реальным планом</span></p>
-          <dl class="spec">
-            <div><dt>Тип</dt><dd>База отдыха</dd></div>
-            <div><dt>Среда</dt><dd><span class="todo">уточнить</span></dd></div>
-            <div><dt>Укрытия</dt><dd><span class="todo">уточнить</span></dd></div>
-            <div><dt>Возраст</dt><dd><span class="todo">уточнить</span></dd></div>
+
+        <!-- ---------- Давыдково Family ---------- -->
+        <div class="loc" role="tabpanel" id="loc-dav" aria-labelledby="t-dav">
+          <header class="loc__head">
+            <h3 class="loc__name">Давыдково Family</h3>
+            <p class="loc__lead">Семейный комплекс отдыха. Игровой полигон лазертага с декорациями расположен на поляне в центре комплекса.</p>
+          </header>
+
+          <div class="galw">
+            <div class="gal-tools"><span class="hint-fine">[ наведите: прицел проявляет кадр. Клик: открыть ]</span><span class="hint-touch">[ нажмите на кадр, чтобы открыть ]</span><button class="gal-mode" type="button" aria-pressed="false">Показать в цвете</button></div>
+            <!-- ЗАМЕНИТЬ: фото-заглушки на реальные снимки Давыдково (img/davydkovo-01.jpg ... ) -->
+            <ul class="gal" data-gal="Давыдково Family">
+              <li class="w2 h2"><a href="img/davydkovo-01.jpg" data-cap="полигон"><img src="img/davydkovo-01.jpg" alt="Фото: Давыдково Family, полигон" loading="lazy"></a></li>
+              <li><a href="img/davydkovo-02.jpg"><img src="img/davydkovo-02.jpg" alt="Фото: Давыдково Family" loading="lazy"></a></li>
+              <li><a href="img/davydkovo-03.jpg"><img src="img/davydkovo-03.jpg" alt="Фото: Давыдково Family" loading="lazy"></a></li>
+              <li><a href="img/davydkovo-04.jpg" data-cap="Дом сказок"><img src="img/davydkovo-04.jpg" alt="Фото: Дом сказок" loading="lazy"></a></li>
+              <li><a href="img/davydkovo-05.jpg"><img src="img/davydkovo-05.jpg" alt="Фото: Давыдково Family" loading="lazy"></a></li>
+              <li class="w2"><a href="img/davydkovo-06.jpg"><img src="img/davydkovo-06.jpg" alt="Фото: Давыдково Family" loading="lazy"></a></li>
+              <li><a href="img/davydkovo-07.jpg"><img src="img/davydkovo-07.jpg" alt="Фото: Давыдково Family" loading="lazy"></a></li>
+              <li><a href="img/davydkovo-08.jpg"><img src="img/davydkovo-08.jpg" alt="Фото: Давыдково Family" loading="lazy"></a></li>
+            </ul>
+          </div>
+
+          <!-- Цены ниже даны по тексту клуба. ЗАМЕНИТЬ/ПРОВЕРИТЬ актуальность перед запуском -->
+          <ul class="tariff">
+            <li><span>День рождения в Доме сказок, часовая программа</span><b>от 12 000 ₽</b></li>
+            <li><span>Праздник с лазертагом, 3 часа</span><b>18 000 ₽</b></li>
+          </ul>
+
+          <div class="loc__cols">
+            <section class="svc">
+              <h4>Лазертаг</h4>
+              <ul>
+                <li>Безопасный полигон с новыми современными лёгкими тагерами</li>
+                <li>Летом: площадка для игры на улице</li>
+                <li>Зимой: сценарий «Спасение Деда Мороза»</li>
+                <li>Праздник с лазертагом: 3 часа</li>
+              </ul>
+            </section>
+            <section class="svc">
+              <h4>Дом сказок</h4>
+              <ul>
+                <li>Интерактивный театр-музей: палаты, чертоги чародеев, светелки волшебниц, зал для балов</li>
+                <li>Гости становятся участниками событий, общаются с героями и придумывают свой ход сюжета</li>
+                <li>Спектакли и представления, экскурсии, мастер-классы</li>
+                <li>Волшебные дни рождения, сказочные выпускные для дошколят и младших школьников</li>
+              </ul>
+            </section>
+            <section class="svc">
+              <h4>Мероприятия</h4>
+              <ul>
+                <li>Выпускные, дни рождения, юбилеи, корпоративы, Новый год, 1 сентября</li>
+                <li>Банкетный зал: торжества, юбилеи, корпоративы, свадьбы</li>
+                <li>Интерактивы, викторины, программы 12+</li>
+                <li>Аниматоры, ведущие, актёры</li>
+                <li>Диджей, музыка, дым</li>
+              </ul>
+            </section>
+            <section class="svc">
+              <h4>Комплекс</h4>
+              <ul>
+                <li>Бассейны для взрослых и малышей, бассейн с сауной</li>
+                <li>Мини-ферма</li>
+                <li>Батут, детская площадка, детская игровая комната</li>
+                <li>Детская комната с залом и кафе в аренду</li>
+                <li>Залы и веранды в аренду</li>
+              </ul>
+            </section>
+            <section class="svc">
+              <h4>Летом</h4>
+              <ul>
+                <li>Детская площадка на улице: батуты, аттракционы, горки, игровые домики, качели</li>
+                <li>2 пруда для рыбалки</li>
+                <li>Беседки и мангалы, столы и скамейки</li>
+              </ul>
+            </section>
+            <section class="svc">
+              <h4>Зимой</h4>
+              <ul>
+                <li>Горки и прокат ледянок</li>
+                <li>Каток</li>
+                <li>Лазертаг</li>
+              </ul>
+            </section>
+          </div>
+
+          <dl class="facts">
+            <div><dt>Лазертаг</dt><dd><a href="tel:+79773161516">+7 (977) 316-15-16</a></dd></div>
+            <div><dt>Дом сказок</dt><dd><a href="tel:+79254151538">+7 (925) 415-15-38</a></dd></div>
+            <div><dt>Кафе, бассейн</dt><dd><a href="tel:+79266804749">+7 (926) 680-47-49</a></dd></div>
+            <div><dt>Аренда беседок</dt><dd><a href="tel:+79773161516">+7 (977) 316-15-16</a></dd></div>
+            <div><dt>Адрес</dt><dd><span class="todo">добавить адрес</span></dd></div>
           </dl>
         </div>
-        <div class="loc" role="tabpanel" id="loc3" aria-labelledby="t3">
-          <div class="plan" data-seed="7" data-kind="mix" role="img" aria-label="Условная схема полигона «Давыдково Family»"></div>
-          <p class="plan__cap">Условная схема · <span class="todo">заменить реальным планом</span></p>
-          <dl class="spec">
-            <div><dt>Тип</dt><dd><span class="todo">уточнить</span></dd></div>
-            <div><dt>Среда</dt><dd><span class="todo">уточнить</span></dd></div>
-            <div><dt>Укрытия</dt><dd><span class="todo">уточнить</span></dd></div>
-            <div><dt>Возраст</dt><dd><span class="todo">уточнить</span></dd></div>
-          </dl>
+
+        <!-- Временно скрыто. Чтобы вернуть локацию: раскомментируйте блок и вкладку выше.
+        <div class="loc" role="tabpanel" id="loc-ultra" aria-labelledby="t-ultra">
+          <header class="loc__head"><h3 class="loc__name">База отдыха «Ультра»</h3><p class="loc__lead">ЗАМЕНИТЬ: описание локации.</p></header>
+          <div class="galw">
+            <div class="gal-tools"><span class="hint-fine">[ наведите: прицел проявляет кадр. Клик: открыть ]</span><span class="hint-touch">[ нажмите на кадр, чтобы открыть ]</span><button class="gal-mode" type="button" aria-pressed="false">Показать в цвете</button></div>
+            <ul class="gal" data-gal="База отдыха Ультра">
+              <li class="w2 h2"><a href="img/ultra-01.jpg"><img src="img/ultra-01.jpg" alt="Фото: база отдыха Ультра" loading="lazy"></a></li>
+            </ul>
+          </div>
+          <div class="loc__cols">
+            <section class="svc"><h4>Полигон</h4><ul><li>ЗАМЕНИТЬ</li></ul></section>
+          </div>
         </div>
-        <div class="loc" role="tabpanel" id="loc4" aria-labelledby="t4">
-          <div class="plan" data-seed="666" data-kind="rooms" role="img" aria-label="Условная схема локации «Психбольница 666»"></div>
-          <p class="plan__cap">Условная схема · <span class="todo">заменить реальным планом</span></p>
-          <dl class="spec">
-            <div><dt>Возраст</dt><dd>12+</dd></div>
-            <div><dt>Формат</dt><dd>Тематическая локация</dd></div>
-            <div><dt>Среда</dt><dd><span class="todo">уточнить</span></dd></div>
-            <div><dt>Сценарий</dt><dd><span class="todo">уточнить</span></dd></div>
-          </dl>
+
+        <div class="loc" role="tabpanel" id="loc-psy" aria-labelledby="t-psy">
+          <header class="loc__head"><h3 class="loc__name">Психбольница 666</h3><p class="loc__lead">Тематическая локация, 12+. ЗАМЕНИТЬ: описание.</p></header>
+          <div class="galw">
+            <div class="gal-tools"><span class="hint-fine">[ наведите: прицел проявляет кадр. Клик: открыть ]</span><span class="hint-touch">[ нажмите на кадр, чтобы открыть ]</span><button class="gal-mode" type="button" aria-pressed="false">Показать в цвете</button></div>
+            <ul class="gal" data-gal="Психбольница 666">
+              <li class="w2 h2"><a href="img/psy-01.jpg"><img src="img/psy-01.jpg" alt="Фото: Психбольница 666" loading="lazy"></a></li>
+            </ul>
+          </div>
+          <div class="loc__cols">
+            <section class="svc"><h4>Полигон</h4><ul><li>ЗАМЕНИТЬ</li></ul></section>
+          </div>
         </div>
+        -->
+
       </div>
     </div>
   </div>
@@ -202,36 +365,38 @@
       <li><a class="row" href="#contact" data-type="Игра на выезд"><b>06</b><strong>На выезд</strong><span>Привезём оборудование в любое время года</span><em></em><i aria-hidden="true">→</i></a></li>
       <li><a class="row" href="#contact" data-type="Сотрудничество"><b>07</b><strong>Партнёрам</strong><span>Площадки, базы отдыха, агентства праздников. Бартер, взаимная реклама</span><em></em><i aria-hidden="true">→</i></a></li>
     </ul>
-
-    <div class="extras rv">
-      <p class="mono">К игре можно добавить (зависит от площадки)</p>
-      <ul class="chips">
-        <li>Барбекю</li><li>Бассейн</li><li>Мини-ферма</li><li>Рыбалка</li><li>Шоу и диско</li><li>Мастер-классы</li><li>Фото и рилс</li><li>Застолье в Штабе</li>
-      </ul>
-    </div>
   </div>
 </section>
 
-<!-- ============ 04 ШТАБ И ВЫЕЗД ============ -->
-<section class="sec" id="hq">
+<!-- ============ 04 ВЫЕЗД ============ -->
+<section class="sec" id="trip">
   <div class="wrap">
     <header class="sec__head rv">
-      <p class="idx"><b>04</b> / штаб и выезд</p>
-      <h2>Штаб и выезд</h2>
+      <p class="idx"><b>04</b> / выезд</p>
+      <h2>Выезд</h2>
     </header>
 
-    <div class="duo rv">
-      <article class="card card--hq">
-        <span class="card__ghost" aria-hidden="true">ШТАБ</span>
-        <h3>Штаб</h3>
-        <p>Мини-музей с подлинными вещами ушедших эпох. Зал с реквизитом и раритетами, предметы времён Великой Отечественной войны. Здесь же проходит застолье после игры.</p>
-        <p class="plan__cap"><span class="todo">добавить фото штаба</span></p>
-      </article>
-      <article class="card card--road">
-        <h3>На выезд</h3>
-        <p>Если вы не едете к нам, приезжаем сами. Проходимая Нива с полным комплектом оборудования доберётся до любого места, в любое время года.</p>
-        <svg class="route" viewBox="0 0 400 90" aria-hidden="true"><path d="M8 70 C 80 70, 90 20, 170 28 S 290 78, 392 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 6"/><rect x="2" y="64" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="392" cy="18" r="6" fill="none" stroke="#ff4a1c" stroke-width="1.5"/><circle cx="392" cy="18" r="1.8" fill="#ff4a1c"/></svg>
-      </article>
+    <div class="trip rv">
+      <div class="trip__txt">
+        <p class="trip__lead">Если вы не едете к нам, значит мы приедем сами.</p>
+        <p>Организуем игры на выезд в любое время года. Наша проходимая Нива с полным комплектом оборудования доберётся до любого места.</p>
+        <dl class="spec">
+          <div><dt>Сезон</dt><dd>Любое время года</dd></div>
+          <div><dt>Транспорт</dt><dd>Проходимая Нива</dd></div>
+          <div><dt>Оборудование</dt><dd>Полный комплект</dd></div>
+          <div><dt>Условия, стоимость</dt><dd><span class="todo">уточнить</span></dd></div>
+        </dl>
+        <a class="btn" href="#contact" data-type="Игра на выезд">Заказать выезд</a>
+      </div>
+      <svg class="route" viewBox="0 0 520 300" aria-hidden="true">
+        <g stroke="rgba(235,233,228,.07)" stroke-width="1"><path d="M0 60H520M0 120H520M0 180H520M0 240H520M104 0V300M208 0V300M312 0V300M416 0V300"/></g>
+        <path class="route__p" d="M44 236 C 120 236, 130 150, 220 168 S 330 250, 400 130 S 450 80, 476 62" fill="none" stroke="currentColor" stroke-width="1.6" stroke-dasharray="5 7"/>
+        <rect x="34" y="226" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"/>
+        <circle cx="476" cy="62" r="12" fill="none" stroke="#ff4a1c" stroke-width="1.6"/>
+        <circle cx="476" cy="62" r="3" fill="#ff4a1c"/>
+        <text x="30" y="270" class="route__t">КЛУБ</text>
+        <text x="400" y="38" class="route__t route__t--s">ВАША ПЛОЩАДКА</text>
+      </svg>
     </div>
   </div>
 </section>
@@ -270,7 +435,7 @@
             <option>Другое</option>
           </select>
         </label>
-        <label>Сообщение<textarea name="message" rows="3" maxlength="3000" placeholder="Дата, возраст, число участников"></textarea></label>
+        <label>Сообщение<textarea name="message" rows="3" maxlength="3000" placeholder="Дата, возраст, число участников, локация"></textarea></label>
         <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
         <label class="check"><input type="checkbox" name="consent" required><span>Согласен на обработку персональных данных. <a href="privacy.html" target="_blank" rel="noopener">Политика</a></span></label>
         <button class="btn" type="submit">Отправить заявку</button>
@@ -289,6 +454,6 @@
   </div>
 </footer>
 
-<script src="main.js?v=1"></script>
+<script src="main.js?v=4"></script>
 </body>
 </html>

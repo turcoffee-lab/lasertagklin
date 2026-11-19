@@ -1,7 +1,12 @@
-/* ===== Настройки формы ===== */
-const FORM_ENDPOINT = '';                   // 'send.php' на хостинге с PHP. Пусто = открывается почтовая программа
-const FORM_EMAIL = 'info@your-domain.ru';  // ЗАМЕНИТЬ: реальный адрес клуба
-const WEB3FORMS_KEY = '';                   // нужен только если FORM_ENDPOINT = 'https://api.web3forms.com/submit'
+/* ===== Настройки формы =====
+   Способ отправки выбирается одной строкой FORM_ENDPOINT:
+   1) ''                                   — открывается почтовая программа (режим по умолчанию)
+   2) 'send.php'                           — свой обработчик на хостинге с PHP (файл send.php из архива)
+   3) 'https://api.web3forms.com/submit'   — сервис Web3Forms, нужен ключ в WEB3FORMS_KEY
+   В режиме 2 адрес получателя задаётся в send.php (массив $CONFIG), в режиме 3 — при получении ключа на сайте Web3Forms. */
+const FORM_ENDPOINT = '';
+const FORM_EMAIL = 'info@your-domain.ru';  // ЗАМЕНИТЬ: показывается в сообщении об ошибке и используется в режиме 1
+const WEB3FORMS_KEY = '';                   // только для режима 3
 
 (function () {
   'use strict';
@@ -52,6 +57,15 @@ const WEB3FORMS_KEY = '';                   // нужен только если 
     const o = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); o.unobserve(e.target); } }), { threshold: .12 });
     rv.forEach(el => o.observe(el));
   } else rv.forEach(el => el.classList.add('in'));
+
+  /* ---------- число полигонов = число вкладок ---------- */
+  (function () {
+    const n = $$('.loc-tab').length, el = $('#stat-locs'), lb = $('#stat-locs-l');
+    if (!el || !n) return;
+    el.dataset.count = n; el.textContent = n;
+    const m10 = n % 10, m100 = n % 100;
+    lb.textContent = (m10 === 1 && m100 !== 11) ? 'полигон' : (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) ? 'полигона' : 'полигонов';
+  })();
 
   /* ---------- счётчики ---------- */
   $$('[data-count]').forEach(el => {
@@ -221,48 +235,6 @@ const WEB3FORMS_KEY = '';                   // нужен только если 
     requestAnimationFrame(frame);
   })();
 
-  /* ---------- схемы полигонов ---------- */
-  function rng(s) { return function () { s |= 0; s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
-  function buildPlan(el) {
-    const r = rng(+el.dataset.seed || 1), kind = el.dataset.kind;
-    const f = n => n.toFixed(1);
-    let s = '<svg viewBox="0 0 100 62" preserveAspectRatio="xMidYMid meet" aria-hidden="true">';
-    for (let x = 10; x < 100; x += 10) s += '<line class="gl" x1="' + x + '" y1="0" x2="' + x + '" y2="62"/>';
-    for (let y = 10; y < 62; y += 10) s += '<line class="gl" x1="0" y1="' + y + '" x2="100" y2="' + y + '"/>';
-    s += '<rect class="bd" x="1" y="1" width="98" height="60"/>';
-    for (let i = 0; i < 9; i++) s += '<text x="' + (8 + i * 10) + '" y="4.6">' + String.fromCharCode(65 + i) + '</text>';
-    for (let i = 1; i < 6; i++) s += '<text x="2" y="' + (i * 10 + 1) + '">' + String(i + 1).padStart(2, '0') + '</text>';
-    const rect = (x, y, w, h, c) => '<rect class="' + (c || 'ob') + '" x="' + f(x) + '" y="' + f(y) + '" width="' + f(w) + '" height="' + f(h) + '"/>';
-    const circ = (x, y, rr) => '<circle class="ob" cx="' + f(x) + '" cy="' + f(y) + '" r="' + f(rr) + '"/>';
-    const rx = (a, b) => a + r() * (b - a);
-
-    if (kind === 'bunker') {
-      s += '<rect class="wl" x="5" y="8" width="60" height="48" fill="none"/>';
-      s += '<rect class="zone" x="65" y="8" width="30" height="48"/>';
-      for (let i = 0; i < 6; i++) s += rect(rx(12, 54), rx(14, 46), rx(5, 10), rx(2.5, 4));
-      for (let i = 0; i < 3; i++) s += rect(rx(10, 58), rx(12, 48), rx(1.8, 2.6), rx(8, 14));
-      s += '<path class="tr" d="M70 16 H90 V26 H74 V38 H92 V48"/>';
-      for (let i = 0; i < 3; i++) s += rect(rx(72, 88), rx(14, 46), 3.5, 3.5);
-    } else if (kind === 'open') {
-      s += '<rect class="zone" x="6" y="8" width="88" height="48"/>';
-      for (let i = 0; i < 16; i++) s += circ(rx(14, 86), rx(12, 52), rx(1.2, 2.6));
-      for (let i = 0; i < 4; i++) s += rect(rx(18, 78), rx(14, 46), rx(5, 8), rx(3, 5));
-    } else if (kind === 'rooms') {
-      s += '<rect class="wl" x="6" y="8" width="88" height="48" fill="none"/>';
-      s += '<path class="wl" d="M35 8 V22 M35 30 V56 M64 8 V34 M64 42 V56 M6 32 H20 M28 32 H35 M35 32 H48 M56 32 H64 M64 32 H80 M88 32 H94"/>';
-      for (let i = 0; i < 9; i++) s += rect(rx(10, 86), rx(11, 50), rx(2.5, 5), rx(2, 4));
-    } else {
-      s += '<rect class="zone" x="6" y="8" width="88" height="48"/>';
-      for (let i = 0; i < 7; i++) s += rect(rx(14, 80), rx(12, 48), rx(4, 9), rx(2.5, 5));
-      for (let i = 0; i < 8; i++) s += circ(rx(14, 86), rx(12, 52), rx(1.2, 2.2));
-      s += '<path class="tr" d="M30 56 V40 H52 V24 H78"/>';
-    }
-    s += '<rect class="sp" x="2.6" y="29" width="3.2" height="3.2"/><text class="sp-t" x="2.2" y="36.5">A</text>';
-    s += '<rect class="sp" x="94.2" y="29" width="3.2" height="3.2"/><text class="sp-t" x="94.6" y="36.5">B</text>';
-    el.innerHTML = s + '</svg>';
-  }
-  $$('.plan[data-kind]').forEach(buildPlan);
-
   /* ---------- вкладки полигонов ---------- */
   const tabs = $$('.loc-tab'), panels = $$('.loc');
   function sel(i, focus) {
@@ -282,9 +254,81 @@ const WEB3FORMS_KEY = '';                   // нужен только если 
   });
   if (tabs.length) sel(0);
 
+  /* ---------- галерея: «прицел» и просмотр ---------- */
+  const galLinks = $$('.gal a');
+  $$('.gal').forEach(g => {
+    const items = $$('a', g);
+    items.forEach((a, i) => {
+      a.style.setProperty('--src', 'url("' + a.getAttribute('href') + '")');
+      const c = document.createElement('span'); c.className = 'cap';
+      c.innerHTML = '<b>' + String(i + 1).padStart(2, '0') + '</b>' + (a.dataset.cap ? ' · ' + a.dataset.cap : '');
+      a.appendChild(c);
+      a.addEventListener('pointermove', e => {
+        if (e.pointerType === 'touch') return;
+        const r = a.getBoundingClientRect();
+        a.style.setProperty('--mx', (e.clientX - r.left) + 'px'); a.style.setProperty('--my', (e.clientY - r.top) + 'px');
+      });
+      a.addEventListener('pointerleave', () => { a.style.setProperty('--mx', '-999px'); a.style.setProperty('--my', '-999px'); });
+      a.addEventListener('click', e => { e.preventDefault(); openLb(items, i, g.dataset.gal || ''); });
+    });
+  });
+  $$('.gal-mode').forEach(b => b.addEventListener('click', () => {
+    const w = b.closest('.galw'), on = !w.classList.contains('is-color');
+    w.classList.toggle('is-color', on);
+    b.setAttribute('aria-pressed', String(on));
+    b.textContent = on ? 'Вернуть прицел' : 'Показать в цвете';
+  }));
+
+  let lb = null;
+  function openLb(items, idx, title) {
+    if (lb) return;
+    const opener = document.activeElement;
+    let i = idx;
+    lb = document.createElement('div');
+    lb.className = 'lb'; lb.setAttribute('role', 'dialog'); lb.setAttribute('aria-modal', 'true'); lb.setAttribute('aria-label', 'Фото: ' + title);
+    lb.innerHTML = '<div class="lb__top"><span class="lb__n"></span><span class="lb__c"></span><button class="lb__x" type="button" aria-label="Закрыть">×</button></div>' +
+      '<button class="lb__a lb__prev" type="button" aria-label="Назад">←</button><figure class="lb__f"><img alt=""></figure><button class="lb__a lb__next" type="button" aria-label="Вперёд">→</button>';
+    document.body.appendChild(lb); document.body.classList.add('noscroll');
+    const img = $('img', lb), n = $('.lb__n', lb), c = $('.lb__c', lb);
+    function show(k) {
+      i = (k + items.length) % items.length;
+      const a = items[i], im = $('img', a);
+      img.classList.remove('on');
+      img.onload = () => img.classList.add('on');
+      img.src = a.getAttribute('href'); img.alt = im ? im.alt : '';
+      n.textContent = String(i + 1).padStart(2, '0') + ' / ' + String(items.length).padStart(2, '0');
+      c.textContent = title + (a.dataset.cap ? ' · ' + a.dataset.cap : '');
+      if (img.complete && img.naturalWidth) img.classList.add('on');
+      [items[(i + 1) % items.length], items[(i - 1 + items.length) % items.length]].forEach(x => { const p = new Image(); p.src = x.getAttribute('href'); });
+    }
+    function close() {
+      document.removeEventListener('keydown', key); lb.remove(); lb = null;
+      document.body.classList.remove('noscroll'); if (opener && opener.focus) opener.focus();
+    }
+    function key(e) {
+      if (e.key === 'Escape') close();
+      else if (e.key === 'ArrowRight') show(i + 1);
+      else if (e.key === 'ArrowLeft') show(i - 1);
+      else if (e.key === 'Tab') {
+        const f = $$('button', lb), first = f[0], last = f[f.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    }
+    document.addEventListener('keydown', key);
+    $('.lb__x', lb).addEventListener('click', close);
+    $('.lb__prev', lb).addEventListener('click', () => show(i - 1));
+    $('.lb__next', lb).addEventListener('click', () => show(i + 1));
+    lb.addEventListener('click', e => { if (e.target === lb) close(); });
+    let sx = null;
+    lb.addEventListener('touchstart', e => { sx = e.touches[0].clientX; }, { passive: true });
+    lb.addEventListener('touchend', e => { if (sx === null) return; const dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 50) show(i + (dx < 0 ? 1 : -1)); sx = null; });
+    show(i); $('.lb__x', lb).focus();
+  }
+
   /* ---------- форматы -> форма ---------- */
   const fType = $('#f-type');
-  $$('.row[data-type]').forEach(a => a.addEventListener('click', () => {
+  $$('[data-type]').forEach(a => a.addEventListener('click', () => {
     if (!fType) return;
     const v = a.dataset.type;
     for (const o of fType.options) if (o.text === v) fType.value = o.value || o.text;
@@ -314,7 +358,7 @@ const WEB3FORMS_KEY = '';                   // нужен только если 
     try {
       const r = await fetch(FORM_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(payload), signal: ac.signal });
       let j = {}; try { j = await r.json(); } catch (_) {}
-      if (r.ok && j.ok !== false) { say('Спасибо! Мы свяжемся с вами в ближайшее время.', 'ok'); form.reset(); }
+      if (r.ok && j.ok !== false && j.success !== false) { say('Спасибо! Мы свяжемся с вами в ближайшее время.', 'ok'); form.reset(); }
       else if (r.status === 422 || r.status === 429) say(j.error || j.message || 'Проверьте данные и попробуйте позже.', 'err');
       else say('Не удалось отправить. Позвоните или напишите нам: 8 (977) 316-15-16, ' + FORM_EMAIL, 'err');
     } catch (_) {
