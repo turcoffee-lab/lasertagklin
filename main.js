@@ -348,28 +348,45 @@ const WEB3FORMS_KEY = '';                   // только для режима 
     $('.lb__prev', lb).addEventListener('click', () => show(i - 1));
     $('.lb__next', lb).addEventListener('click', () => show(i + 1));
     lb.addEventListener('click', e => { if (e.target === lb) close(); });
-    /* масштаб и перемещение: два пальца, колесо мыши, двойное касание; свайп листает только при масштабе 1 */
+    /* масштаб и перемещение: два пальца, колесо мыши, двойное касание; зона зума занимает весь экран.
+       Свайп листает кадры только при масштабе 1. Масштабирование идёт вокруг точки касания. */
     const fig = $('.lb__f', lb);
     let sc = 1, tx = 0, ty = 0, ptrs = new Map(), d0 = 0, sc0 = 1, sx = 0, sy = 0, lastTap = 0, lastTouch = 0, moved = false;
+    const MAXZ = 6;
+    function center() { return [img.offsetLeft + img.offsetWidth / 2, img.offsetTop + img.offsetHeight / 2]; }
+    function clampAxis(t, c, size, view) {          // удерживает края фото в пределах экрана; меньшее экрана центрирует
+      const half = size * sc / 2;
+      return size * sc <= view ? view / 2 - c : Math.max(view - (c + half), Math.min(-(c - half), t));
+    }
     function apply() {
-      const mx = Math.max(0, (img.clientWidth * sc - fig.clientWidth) / 2), my = Math.max(0, (img.clientHeight * sc - fig.clientHeight) / 2);
-      tx = Math.max(-mx, Math.min(mx, tx)); ty = Math.max(-my, Math.min(my, ty));
+      const c = center();
+      tx = clampAxis(tx, c[0], img.offsetWidth, fig.clientWidth); ty = clampAxis(ty, c[1], img.offsetHeight, fig.clientHeight);
       img.style.transform = sc === 1 ? '' : 'translate(' + tx + 'px,' + ty + 'px) scale(' + sc + ')';
-      fig.classList.toggle('zoomed', sc > 1);
+      fig.classList.toggle('zoomed', sc > 1); lb.classList.toggle('zoomed', sc > 1);
     }
     function reset() { sc = 1; tx = 0; ty = 0; apply(); }
+    function zoomTo(ns, mx, my) {                   // mx,my: точка в координатах окна, остаётся под пальцами
+      ns = Math.max(1, Math.min(MAXZ, ns));
+      if (ns === 1) { reset(); return; }
+      const r = fig.getBoundingClientRect(), c = center(), px = mx - r.left - c[0], py = my - r.top - c[1];
+      tx = px - (px - tx) * ns / sc; ty = py - (py - ty) * ns / sc; sc = ns; apply();
+    }
+    function mid() { const p = Array.from(ptrs.values()); return [(p[0].x + p[1].x) / 2, (p[0].y + p[1].y) / 2]; }
     function dist() { const p = Array.from(ptrs.values()); return Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y); }
+    let m0 = null;
     fig.addEventListener('pointerdown', e => {
       fig.setPointerCapture(e.pointerId); ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
-      if (ptrs.size === 2) { d0 = dist(); sc0 = sc; }
+      if (ptrs.size === 2) { d0 = dist(); sc0 = sc; m0 = mid(); }
       sx = e.clientX; sy = e.clientY; moved = false;
     });
     fig.addEventListener('pointermove', e => {
       const p = ptrs.get(e.pointerId); if (!p) return;
       const dx = e.clientX - p.x, dy = e.clientY - p.y; p.x = e.clientX; p.y = e.clientY;
       if (Math.abs(e.clientX - sx) + Math.abs(e.clientY - sy) > 8) moved = true;
-      if (ptrs.size === 2) { sc = Math.max(1, Math.min(5, sc0 * dist() / d0)); if (sc === 1) { tx = 0; ty = 0; } apply(); }
-      else if (sc > 1) { tx += dx; ty += dy; apply(); }
+      if (ptrs.size === 2) {
+        const m = mid(); tx += m[0] - m0[0]; ty += m[1] - m0[1]; m0 = m;   // перемещение двумя пальцами
+        zoomTo(sc0 * dist() / d0, m[0], m[1]);
+      } else if (sc > 1) { tx += dx; ty += dy; apply(); }
     });
     function up(e) {
       const had = ptrs.delete(e.pointerId);
@@ -381,13 +398,14 @@ const WEB3FORMS_KEY = '';                   // только для режима 
         if (sc === 1 && e.pointerType === 'touch' && Math.abs(dx) > 50 && Math.abs(e.clientY - sy) < 80) show(i + (dx < 0 ? 1 : -1));
         else if (!moved && e.pointerType === 'touch') {
           const now = Date.now();
-          if (now - lastTap < 300) { if (sc > 1) reset(); else { sc = 2.5; apply(); } lastTap = 0; } else lastTap = now;
+          if (now - lastTap < 300) { if (sc > 1) reset(); else zoomTo(2.5, e.clientX, e.clientY); lastTap = 0; } else lastTap = now;
         }
       }
     }
     fig.addEventListener('pointerup', up); fig.addEventListener('pointercancel', up);
-    fig.addEventListener('dblclick', () => { if (Date.now() - lastTouch < 800) return; if (sc > 1) reset(); else { sc = 2.5; apply(); } });
-    fig.addEventListener('wheel', e => { e.preventDefault(); sc = Math.max(1, Math.min(5, sc * (e.deltaY < 0 ? 1.15 : .87))); if (sc === 1) { tx = 0; ty = 0; } apply(); }, { passive: false });
+    fig.addEventListener('dblclick', e => { if (Date.now() - lastTouch < 800) return; if (sc > 1) reset(); else zoomTo(2.5, e.clientX, e.clientY); });
+    fig.addEventListener('wheel', e => { e.preventDefault(); zoomTo(sc * (e.deltaY < 0 ? 1.15 : .87), e.clientX, e.clientY); }, { passive: false });
+    window.addEventListener('resize', reset);
     img.addEventListener('load', reset);
     zoomReset = reset;
     show(i); $('.lb__x', lb).focus();
