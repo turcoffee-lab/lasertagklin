@@ -16,11 +16,14 @@ const WEB3FORMS_KEY = '';                   // только для режима 
 
   /* ---------- меню ---------- */
   const burger = $('.burger'), nav = $('#nav');
-  function closeMenu() { nav.classList.remove('open'); burger.setAttribute('aria-expanded', 'false'); }
-  burger.addEventListener('click', () => {
-    const open = nav.classList.toggle('open');
+  function setMenu(open) {
+    nav.classList.toggle('open', open);
     burger.setAttribute('aria-expanded', String(open));
-  });
+    document.body.classList.toggle('noscroll', open);
+  }
+  function closeMenu() { setMenu(false); }
+  burger.addEventListener('click', () => setMenu(!nav.classList.contains('open')));
+  addEventListener('resize', () => { if (innerWidth > 820) closeMenu(); });
   $$('a', nav).forEach(a => a.addEventListener('click', closeMenu));
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
 
