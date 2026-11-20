@@ -23,7 +23,7 @@ const WEB3FORMS_KEY = '';                   // только для режима 
   }
   function closeMenu() { setMenu(false); }
   burger.addEventListener('click', () => setMenu(!nav.classList.contains('open')));
-  addEventListener('resize', () => { if (innerWidth > 820) closeMenu(); });
+  addEventListener('resize', () => { if (innerWidth > 1060) closeMenu(); });
   $$('a', nav).forEach(a => a.addEventListener('click', closeMenu));
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
 

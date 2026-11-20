@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500&display=swap&subset=cyrillic">
-<link rel="stylesheet" href="style.css?v=10">
+<link rel="stylesheet" href="style.css?v=7">
 <script>document.documentElement.classList.add('js')</script>
 <script type="application/ld+json">
 {
@@ -43,6 +43,7 @@
     <a href="#trip">Выезд</a>
     <a href="#gear">Оборудование</a>
     <a href="#formats">Форматы</a>
+    <a href="#team">Команда</a>
     <a href="#contact" class="nav__cta">Записаться</a>
   </nav>
   <a class="btn btn--sm bar__btn" href="#contact">Записаться</a>
@@ -102,7 +103,7 @@
 
         Шаблон панели:
         <div class="loc" role="tabpanel" id="loc-NEW" aria-labelledby="t-NEW">
-          <header class="loc__head"><h3 class="loc__name">Название</h3><p class="loc__lead">Одна-две фразы о локации.</p></header>
+<div class="loc__top">            <header class="loc__head"><h3 class="loc__name">Название</h3><p class="loc__lead">Одна-две фразы о локации.</p></header>            <div class="story"><p class="story__tag"><span class="todo">черновик: заменить текстом клуба</span></p><p>ЗАМЕНИТЬ: живой текст о локации.</p></div>          </div>
           <div class="galw">
             <div class="gal-tools"><span class="hint-fine">[ наведите: прицел проявляет кадр. Клик: открыть ]</span><span class="hint-touch">[ ведите пальцем по кадру: прицел проявляет его. Касание: открыть ]</span><button class="gal-mode" type="button" aria-pressed="false">Показать в цвете</button></div>
             <ul class="gal" data-gal="Название">
@@ -114,6 +115,8 @@
             <section class="svc"><h4>Заголовок группы</h4><ul><li>Пункт</li><li>Пункт</li></ul></section>
           </div>
         </div>
+
+        Живой текст о локации (без пунктов) пишется внутри <div class="story"> рядом с названием. Удалите строку-метку story__tag, когда напишете настоящий текст.
 
         Классы плиток фото: w2 = в два раза шире, h2 = в два раза выше, без класса = обычная.
       -->
@@ -130,10 +133,13 @@
 
         <!-- ---------- Бункер 13 ---------- -->
         <div class="loc" role="tabpanel" id="loc-bunker" aria-labelledby="t-bunker">
-          <header class="loc__head">
+<div class="loc__top">            <header class="loc__head">
             <h3 class="loc__name">Бункер 13</h3>
             <p class="loc__lead">Тематическая просторная локация внутри тёплого помещения и площадка под открытым небом.</p>
-          </header>
+          </header>            <div class="story">
+          <p class="story__tag"><span class="todo">черновик: заменить текстом клуба</span></p>
+          <p>Бункер 13 — это тематическая локация под крышей, где игра не зависит от погоды. Доты, окопы и крепости: за каждым укрытием может прятаться кто-то из команды соперников. Тепло, есть вода и уютная зона ожидания. А когда игра закончена, вас ждёт Штаб: настоящий портал времени с подлинными вещами ушедших эпох, за столом в котором так хорошо разбирать недавний бой.</p>
+        </div>          </div>
 
           <div class="galw">
             <div class="gal-tools"><span class="hint-fine">[ наведите: прицел проявляет кадр. Клик: открыть ]</span><span class="hint-touch">[ ведите пальцем по кадру: прицел проявляет его. Касание: открыть ]</span><button class="gal-mode" type="button" aria-pressed="false">Показать в цвете</button></div>
@@ -180,10 +186,13 @@
 
         <!-- ---------- Давыдково Family ---------- -->
         <div class="loc" role="tabpanel" id="loc-dav" aria-labelledby="t-dav">
-          <header class="loc__head">
+<div class="loc__top">            <header class="loc__head">
             <h3 class="loc__name">Давыдково Family</h3>
             <p class="loc__lead">Семейный комплекс отдыха. Игровой полигон лазертага с декорациями расположен на поляне в центре комплекса.</p>
-          </header>
+          </header>            <div class="story">
+          <p class="story__tag"><span class="todo">черновик: заменить текстом клуба</span></p>
+          <p>На поляне в центре семейного комплекса стоит полигон с настоящими декорациями. Пока одни команды сражаются, малыши плещутся в бассейне, а остальные гости идут на мини-ферму или заглядывают в Дом сказок, где можно поговорить с героями и придумать свой поворот сюжета. Лазертаг здесь не отдельный аттракцион, а часть большого семейного дня. Летом рядом пруды и беседки с мангалами, зимой каток, горки и спасение Деда Мороза.</p>
+        </div>          </div>
 
           <div class="galw">
             <div class="gal-tools"><span class="hint-fine">[ наведите: прицел проявляет кадр. Клик: открыть ]</span><span class="hint-touch">[ ведите пальцем по кадру: прицел проявляет его. Касание: открыть ]</span><button class="gal-mode" type="button" aria-pressed="false">Показать в цвете</button></div>
@@ -274,7 +283,7 @@
 
         <!-- Временно скрыто. Чтобы вернуть локацию: раскомментируйте блок и вкладку выше.
         <div class="loc" role="tabpanel" id="loc-ultra" aria-labelledby="t-ultra">
-          <header class="loc__head"><h3 class="loc__name">База отдыха «Ультра»</h3><p class="loc__lead">ЗАМЕНИТЬ: описание локации.</p></header>
+<div class="loc__top">            <header class="loc__head"><h3 class="loc__name">База отдыха «Ультра»</h3><p class="loc__lead">ЗАМЕНИТЬ: описание локации.</p></header>            <div class="story"><p class="story__tag"><span class="todo">черновик: заменить текстом клуба</span></p><p>ЗАМЕНИТЬ: живой текст о локации.</p></div>          </div>
           <div class="galw">
             <div class="gal-tools"><span class="hint-fine">[ наведите: прицел проявляет кадр. Клик: открыть ]</span><span class="hint-touch">[ ведите пальцем по кадру: прицел проявляет его. Касание: открыть ]</span><button class="gal-mode" type="button" aria-pressed="false">Показать в цвете</button></div>
             <ul class="gal" data-gal="База отдыха Ультра">
@@ -287,7 +296,7 @@
         </div>
 
         <div class="loc" role="tabpanel" id="loc-psy" aria-labelledby="t-psy">
-          <header class="loc__head"><h3 class="loc__name">Психбольница 666</h3><p class="loc__lead">Тематическая локация, 12+. ЗАМЕНИТЬ: описание.</p></header>
+<div class="loc__top">            <header class="loc__head"><h3 class="loc__name">Психбольница 666</h3><p class="loc__lead">Тематическая локация, 12+. ЗАМЕНИТЬ: описание.</p></header>            <div class="story"><p class="story__tag"><span class="todo">черновик: заменить текстом клуба</span></p><p>ЗАМЕНИТЬ: живой текст о локации.</p></div>          </div>
           <div class="galw">
             <div class="gal-tools"><span class="hint-fine">[ наведите: прицел проявляет кадр. Клик: открыть ]</span><span class="hint-touch">[ ведите пальцем по кадру: прицел проявляет его. Касание: открыть ]</span><button class="gal-mode" type="button" aria-pressed="false">Показать в цвете</button></div>
             <ul class="gal" data-gal="Психбольница 666">
@@ -314,10 +323,13 @@
     </header>
 
     <div class="prog rv">
-      <header class="loc__head">
+<div class="loc__top">        <header class="loc__head">
         <h3 class="loc__name">Лазертаг для детей от 7 лет</h3>
         <p class="loc__lead">Регулярные занятия: командная спортивно-тактическая игра на безопасном современном оборудовании.</p>
-      </header>
+      </header>        <div class="story">
+          <p class="story__tag"><span class="todo">черновик: заменить текстом клуба</span></p>
+          <p>Первая игра всегда с волнением: тагер в руках, команда рядом, впереди задание. В секции мы делаем так, чтобы волнение быстро сменялось азартом, а азарт дружбой. Лёгкие современные тагеры, безопасные инфракрасные лучи и инструктор, который видит каждого. Дети привыкают действовать командой и выполнять задания вместе.</p>
+        </div>      </div>
 
           <div class="galw">
             <div class="gal-tools"><span class="hint-fine">[ наведите: прицел проявляет кадр. Клик: открыть ]</span><span class="hint-touch">[ ведите пальцем по кадру: прицел проявляет его. Касание: открыть ]</span><button class="gal-mode" type="button" aria-pressed="false">Показать в цвете</button></div>
@@ -383,10 +395,13 @@
     </header>
 
     <div class="prog rv">
-      <header class="loc__head">
+<div class="loc__top">        <header class="loc__head">
         <h3 class="loc__name">Игра на выезд</h3>
         <p class="loc__lead">Если вы не едете к нам, значит мы приедем сами. В любое время года.</p>
-      </header>
+      </header>        <div class="story">
+          <p class="story__tag"><span class="todo">черновик: заменить текстом клуба</span></p>
+          <p>Не получается приехать к нам, приедем мы. Проходимая Нива, полный комплект оборудования, и ваша площадка становится полигоном. Зимой и летом, там, где вам удобно: игра состоится.</p>
+        </div>      </div>
 
           <div class="galw">
             <div class="gal-tools"><span class="hint-fine">[ наведите: прицел проявляет кадр. Клик: открыть ]</span><span class="hint-touch">[ ведите пальцем по кадру: прицел проявляет его. Касание: открыть ]</span><button class="gal-mode" type="button" aria-pressed="false">Показать в цвете</button></div>
@@ -505,11 +520,56 @@
   </div>
 </section>
 
-<!-- ============ 06 ЗАЯВКА ============ -->
+<!-- ============ 06 КОМАНДА ============ -->
+<section class="sec" id="team">
+  <div class="wrap">
+    <header class="sec__head rv">
+      <p class="idx"><b>06</b> / команда</p>
+      <h2>Команда</h2>
+    </header>
+
+    <div class="team rv">
+      <!--
+        КАК ДОБАВИТЬ ЕЩЁ ОДНОГО СОТРУДНИКА: скопируйте весь блок <article class="person"> … </article>
+        ниже (без пометки «руководитель») и вставьте после него. Фото кладётся в img/ (например img/staff-01.jpg).
+      -->
+      <article class="person">
+        <div class="galw person__ph">
+          <!-- ЗАМЕНИТЬ: портрет руководителя -> img/director.jpg (вертикальное фото 4:5, 800x1000, до 200 КБ) -->
+          <ul class="gal gal--solo" data-gal="Руководитель клуба">
+            <li><a href="img/director.jpg"><img src="img/director.jpg" alt="Руководитель клуба" loading="lazy"></a></li>
+          </ul>
+        </div>
+        <div class="person__body">
+          <p class="person__role">Руководитель клуба · инструктор</p>
+          <h3 class="person__name"><span class="todo">имя и фамилия</span></h3>
+          <p class="person__lead">Главная фишка нашего клуба: здесь нет наёмного персонала, которому наплевать на ваш праздник. Я контролирую всё сам от и до.</p>
+          <p class="person__text">Сам принимаю ваш звонок, сам бронирую дату, сам экипирую детей и сам лично работаю инструктором на площадках, отвечая за каждую улыбку и безопасность во время игры.</p>
+          <p class="person__text">Я строгий дядя-инструктор, который не потерпит хаоса и бардака во время игры. При этом я люблю детей, а дети любят меня.</p>
+          <div class="person__duty">
+            <section class="svc">
+              <h4>Всё лично</h4>
+              <ul>
+                <li>Принимает звонок</li>
+                <li>Бронирует дату</li>
+                <li>Экипирует детей</li>
+                <li>Работает инструктором на площадках</li>
+                <li>Отвечает за безопасность в игре</li>
+              </ul>
+            </section>
+          </div>
+          <p class="prog__cta"><a class="btn" href="tel:+79773161516">Позвонить 8 (977) 316-15-16</a></p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 07 ЗАЯВКА ============ -->
 <section class="sec" id="contact">
   <div class="wrap">
     <header class="sec__head rv">
-      <p class="idx"><b>06</b> / заявка</p>
+      <p class="idx"><b>07</b> / заявка</p>
       <h2>Записаться на игру</h2>
     </header>
 
@@ -521,6 +581,12 @@
           <li><span>ВКонтакте</span><a href="https://vk.ru/klinskiy_1" rel="noopener" target="_blank">vk.ru/klinskiy_1</a></li>
           <li><span>Сайт</span><b><span class="todo">домен</span></b></li>
           <li><span>Район</span><b>Клин · Солнечногорск</b></li>
+          <!-- ЗАГОТОВКИ КОНТАКТОВ: чтобы включить, удалите две строки с маркерами комментария вокруг <li> ниже и замените данные -->
+          <!--
+          <li><span>Email</span><a href="mailto:info@your-domain.ru">info@your-domain.ru</a></li>
+          <li><span>Telegram</span><a href="https://t.me/USERNAME" rel="noopener" target="_blank">@USERNAME</a></li>
+          <li><span>WhatsApp</span><a href="https://wa.me/79XXXXXXXXX" rel="noopener" target="_blank">+7 (9XX) XXX-XX-XX</a></li>
+          -->
         </ul>
       </div>
 
@@ -558,6 +624,6 @@
   </div>
 </footer>
 
-<script src="main.js?v=10"></script>
+<script src="main.js?v=7"></script>
 </body>
 </html>
