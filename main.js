@@ -275,14 +275,41 @@ const WEB3FORMS_KEY = '';                   // только для режима 
       else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { e.preventDefault(); sel((i - 1 + n) % n, true); }
     });
   });
+  // превью вкладки: первое фото галереи этой локации (новая локация получает превью автоматически)
+  tabs.forEach((t, j) => {
+    const im = panels[j] && panels[j].querySelector('.gal img');
+    if (im) t.style.setProperty('--thumb', 'url("' + im.getAttribute('src') + '")');
+  });
   if (tabs.length) sel(0);
 
   /* ---------- галерея: «прицел» и просмотр ---------- */
   const galLinks = $$('.gal a');
+  // видео ВКонтакте: принимает ссылку video_ext.php (из «Экспорт → код для вставки») или обычную ссылку vk.com/video-123_456
+  function vkEmbed(href) {
+    try {
+      const u = new URL(href, location.href);
+      if (!/^(www\.|m\.)?(vk\.com|vk\.ru|vkvideo\.ru)$/i.test(u.hostname)) return '';
+      let oid, id, hash = u.searchParams.get('hash') || '';
+      if (/video_ext\.php$/i.test(u.pathname)) { oid = u.searchParams.get('oid'); id = u.searchParams.get('id'); }
+      else { const m = (u.pathname + u.search).match(/video(-?\d+)_(\d+)(?:_([0-9a-f]+))?/i); if (m) { oid = m[1]; id = m[2]; hash = hash || m[3] || ''; } }
+      if (!/^-?\d+$/.test(oid || '') || !/^\d+$/.test(id || '')) return '';
+      return 'https://vk.com/video_ext.php?oid=' + oid + '&id=' + id + (hash ? '&hash=' + hash : '') + '&hd=2&autoplay=1';
+    } catch (e) { return ''; }
+  }
   $$('.gal').forEach(g => {
     const items = $$('a', g);
     items.forEach((a, i) => {
-      a.style.setProperty('--src', 'url("' + a.getAttribute('href') + '")');
+      const isV = a.hasAttribute('data-video');
+      if (isV) {
+        a.dataset.embed = vkEmbed(a.getAttribute('href'));
+        a.classList.add('is-video');
+        const pl = document.createElement('span'); pl.className = 'play'; pl.setAttribute('aria-hidden', 'true'); a.appendChild(pl);
+        const pi = $('img', a);
+        if (!pi) a.classList.add('nopost');
+        a.setAttribute('aria-label', 'Видео: ' + (a.dataset.cap || g.dataset.gal || ''));
+      }
+      const poster = isV ? ($('img', a) ? $('img', a).getAttribute('src') : '') : a.getAttribute('href');
+      if (poster) a.style.setProperty('--src', 'url("' + poster + '")');
       const c = document.createElement('span'); c.className = 'cap';
       c.innerHTML = '<b>' + String(i + 1).padStart(2, '0') + '</b>' + (a.dataset.cap ? ' · ' + a.dataset.cap : '');
       a.appendChild(c);
@@ -321,13 +348,29 @@ const WEB3FORMS_KEY = '';                   // только для режима 
     function show(k) {
       i = (k + items.length) % items.length; zoomReset();
       const a = items[i], im = $('img', a);
+      const old = $('iframe', lb); if (old) old.remove();          // уход с видео останавливает его
+      lb.classList.toggle('is-video', a.classList.contains('is-video'));
       img.classList.remove('on');
+      if (a.classList.contains('is-video')) {
+        n.textContent = String(i + 1).padStart(2, '0') + ' / ' + String(items.length).padStart(2, '0');
+        c.textContent = title + (a.dataset.cap ? ' · ' + a.dataset.cap : '');
+        const f = document.createElement('iframe');
+        f.title = 'Видео: ' + (a.dataset.cap || title);
+        f.allow = 'autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock';
+        f.setAttribute('allowfullscreen', ''); f.referrerPolicy = 'strict-origin-when-cross-origin';
+        const r = (a.dataset.ratio || '16/9').split('/');
+        f.style.setProperty('--vr', String((+r[0] || 16) / (+r[1] || 9)));
+        if (a.dataset.embed) f.src = a.dataset.embed;
+        else { f.srcdoc = '<body style="margin:0;background:#0a0b0c;color:#aaa;font:14px sans-serif;display:grid;place-items:center;height:100vh">Видео недоступно: проверьте ссылку</body>'; }
+        $('.lb__f', lb).appendChild(f);
+        return;
+      }
       img.onload = () => img.classList.add('on');
       img.src = a.getAttribute('href'); img.alt = im ? im.alt : '';
       n.textContent = String(i + 1).padStart(2, '0') + ' / ' + String(items.length).padStart(2, '0');
       c.textContent = title + (a.dataset.cap ? ' · ' + a.dataset.cap : '');
       if (img.complete && img.naturalWidth) img.classList.add('on');
-      [items[(i + 1) % items.length], items[(i - 1 + items.length) % items.length]].forEach(x => { const p = new Image(); p.src = x.getAttribute('href'); });
+      [items[(i + 1) % items.length], items[(i - 1 + items.length) % items.length]].forEach(x => { if (x.classList.contains('is-video')) return; const p = new Image(); p.src = x.getAttribute('href'); });
     }
     function close() {
       document.removeEventListener('keydown', key); lb.remove(); lb = null;
