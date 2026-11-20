@@ -280,6 +280,23 @@ const WEB3FORMS_KEY = '';                   // только для режима 
     const im = panels[j] && panels[j].querySelector('.gal img');
     if (im) t.style.setProperty('--thumb', 'url("' + im.getAttribute('src') + '")');
   });
+  // раскладка плиток-вкладок: в последней строке всегда 2+ плитки, пустых мест нет
+  // 5 → 2+3, 6 → 3+3, 7 → 3+4; нижние строки получают лишнюю плитку. Максимум в строке зависит от ширины.
+  const tabBox = tabs.length ? tabs[0].parentElement : null;
+  function layoutTabs() {
+    if (!tabBox) return;
+    const n = tabs.length, W = tabBox.clientWidth, gap = 8, minW = innerWidth <= 960 ? 150 : 220;
+    const max = Math.max(1, Math.min(4, Math.floor((W + gap) / (minW + gap))));
+    const rows = Math.ceil(n / max), base = Math.floor(n / rows), extra = n % rows;
+    const counts = []; for (let r = 0; r < rows; r++) counts.push(base + (r >= rows - extra ? 1 : 0));
+    const gcd = (a, b) => b ? gcd(b, a % b) : a, lcm = (a, b) => a * b / gcd(a, b);
+    const L = counts.reduce(lcm, 1);
+    tabBox.style.gridTemplateColumns = 'repeat(' + L + ',minmax(0,1fr))';
+    let k = 0;
+    counts.forEach(c => { for (let j = 0; j < c; j++) tabs[k++].style.gridColumn = 'span ' + (L / c); });
+  }
+  layoutTabs();
+  let ltT; window.addEventListener('resize', () => { clearTimeout(ltT); ltT = setTimeout(layoutTabs, 60); });
   if (tabs.length) sel(0);
 
   /* ---------- галерея: «прицел» и просмотр ---------- */
