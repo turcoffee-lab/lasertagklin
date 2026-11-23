@@ -16,16 +16,19 @@ const WEB3FORMS_KEY = '';                   // только для режима 
 
   /* ---------- меню ---------- */
   const burger = $('.burger'), nav = $('#nav');
+  const BURGER_W = 1280;                                    // ширина, до которой включается бургер (то же число в style.css)
   function setMenu(open) {
     nav.classList.toggle('open', open);
     burger.setAttribute('aria-expanded', String(open));
     document.body.classList.toggle('noscroll', open);
   }
-  function closeMenu() { setMenu(false); }
-  burger.addEventListener('click', () => setMenu(!nav.classList.contains('open')));
-  addEventListener('resize', () => { if (innerWidth > 1060) closeMenu(); });
-  $$('a', nav).forEach(a => a.addEventListener('click', closeMenu));
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+  function closeMenu() { if (nav) setMenu(false); }
+  if (burger && nav) {
+    burger.addEventListener('click', () => setMenu(!nav.classList.contains('open')));
+    addEventListener('resize', () => { if (innerWidth > BURGER_W) closeMenu(); });
+    $$('a', nav).forEach(a => a.addEventListener('click', closeMenu));
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+  }
 
   /* ---------- прогресс и текущий раздел ---------- */
   const bar = $('.bar__p');
@@ -34,7 +37,7 @@ const WEB3FORMS_KEY = '';                   // только для режима 
     if (tick) return; tick = true;
     requestAnimationFrame(() => {
       const h = document.documentElement.scrollHeight - innerHeight;
-      bar.style.setProperty('--p', h > 0 ? Math.min(1, scrollY / h).toFixed(4) : 0);
+      if (bar) bar.style.setProperty('--p', h > 0 ? Math.min(1, scrollY / h).toFixed(4) : 0);
       tick = false;
     });
   }
@@ -54,6 +57,16 @@ const WEB3FORMS_KEY = '';                   // только для режима 
     $$('main section[id]').forEach(s => secObs.observe(s));
   }
 
+  /* ---------- содержание страницы «О клубе»: подсветка текущего раздела ---------- */
+  const tocLinks = $$('.toc a[href^="#"]');
+  if (tocLinks.length && 'IntersectionObserver' in window) {
+    const tocObs = new IntersectionObserver(es => es.forEach(e => {
+      if (!e.isIntersecting) return;
+      tocLinks.forEach(a => { if (a.getAttribute('href') === '#' + e.target.id) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); });
+    }), { rootMargin: '-30% 0px -60% 0px' });
+    $$('.prose section[id]').forEach(x => tocObs.observe(x));
+  }
+
   /* ---------- появление блоков ---------- */
   const rv = $$('.rv');
   if ('IntersectionObserver' in window && !reduce) {
@@ -61,13 +74,13 @@ const WEB3FORMS_KEY = '';                   // только для режима 
     rv.forEach(el => o.observe(el));
   } else rv.forEach(el => el.classList.add('in'));
 
-  /* ---------- число полигонов = число вкладок ---------- */
+  /* ---------- число локаций = число вкладок ---------- */
   (function () {
     const n = $$('.loc-tab').length, el = $('#stat-locs'), lb = $('#stat-locs-l');
     if (!el || !n) return;
     el.dataset.count = n; el.textContent = n;
     const m10 = n % 10, m100 = n % 100;
-    lb.textContent = (m10 === 1 && m100 !== 11) ? 'полигон' : (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) ? 'полигона' : 'полигонов';
+    lb.textContent = (m10 === 1 && m100 !== 11) ? 'локация' : (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) ? 'локации' : 'локаций';
   })();
 
   /* ---------- счётчики ---------- */
@@ -102,6 +115,7 @@ const WEB3FORMS_KEY = '';                   // только для режима 
     const TG = [[.22, .22], [.36, .42], [.48, .68], [.62, .32], [.78, .60], [.26, .56], [.86, .26]]
       .map(p => { const a = R() * 6.28, v = .006 + R() * .006; return { x: p[0], y: p[1], vx: Math.cos(a) * v, vy: Math.sin(a) * v, off: 0, flash: 0 }; });
     const OR = [.9, .8];
+    const SIG = '95,224,47', HOT = '255,90,28', INK = '234,240,228';   // палитра из логотипа: зелёный луч, оранжевые попадания
     let W = 0, H = 0, dpr = 1, mouse = null, shots = 0, hits = 0, beams = [], sparks = [], lastUser = 0, visible = true, lastAuto = 0, lastT = 0;
     const CELL = 64;
 
@@ -131,12 +145,28 @@ const WEB3FORMS_KEY = '';                   // только для режима 
       if (reduce) return;
       const t = now / 1000;
       for (const o of OB) { o.x = o.bx + o.ax * Math.sin(t * o.sp + o.ph); o.y = o.by + o.ay * Math.cos(t * o.sp * .8 + o.ph); }
+      const P = 12;                                    // радиус цели: цель не заходит в укрытия
       for (const g of TG) {
         let nx = g.x + g.vx * dt, ny = g.y + g.vy * dt;
         if (nx < .04 || nx > .96) { g.vx = -g.vx; nx = g.x; }
         if (ny < .16 || ny > .82) { g.vy = -g.vy; ny = g.y; }
-        if (!inObs(g.x * W, g.y * H, 10) && inObs(nx * W, ny * H, 10)) { g.vx = -g.vx; g.vy = -g.vy; nx = g.x; ny = g.y; }
+        if (inObs(nx * W, g.y * H, P)) { g.vx = -g.vx; nx = g.x; }
+        if (inObs(nx * W, ny * H, P)) { g.vy = -g.vy; ny = g.y; }
         g.x = nx; g.y = ny;
+        // укрытия двигаются сами: если укрытие наехало на цель, выталкиваем её к ближайшему краю
+        for (let k = 0; k < 3; k++) {
+          const px = g.x * W, py = g.y * H;
+          const o = OB.find(o => { const ox = o.x * W, oy = o.y * H; return px >= ox - P && px <= ox + o.w * W + P && py >= oy - P && py <= oy + o.h * H + P; });
+          if (!o) break;
+          const ox = o.x * W, oy = o.y * H;
+          const d = [px - (ox - P), (ox + o.w * W + P) - px, py - (oy - P), (oy + o.h * H + P) - py];
+          const m = Math.min(...d), v = Math.hypot(g.vx, g.vy) || .008;
+          if (m === d[0]) { g.x = (ox - P - 1) / W; g.vx = -Math.abs(g.vx || v); }
+          else if (m === d[1]) { g.x = (ox + o.w * W + P + 1) / W; g.vx = Math.abs(g.vx || v); }
+          else if (m === d[2]) { g.y = (oy - P - 1) / H; g.vy = -Math.abs(g.vy || v); }
+          else { g.y = (oy + o.h * H + P + 1) / H; g.vy = Math.abs(g.vy || v); }
+          g.x = Math.max(.04, Math.min(.96, g.x)); g.y = Math.max(.16, Math.min(.82, g.y));
+        }
       }
     }
     function trace(x0, y0, x1, y1) {
@@ -177,14 +207,14 @@ const WEB3FORMS_KEY = '';                   // только для режима 
     });
     new IntersectionObserver(es => { visible = es[0].isIntersecting; if (visible) requestAnimationFrame(frame); }).observe(hero);
 
-    function text(s, x, y, a) { ctx.fillStyle = 'rgba(235,233,228,' + a + ')'; ctx.fillText(s, x, y); }
+    function text(s, x, y, a, c) { ctx.fillStyle = 'rgba(' + (c || INK) + ',' + a + ')'; ctx.fillText(s, x, y); }
 
     function frame(now) {
       if (!visible) { lastT = 0; return; }
       step(now);
       ctx.clearRect(0, 0, W, H);
       // сетка
-      ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(235,233,228,.055)'; ctx.beginPath();
+      ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(' + INK + ',.055)'; ctx.beginPath();
       for (let x = 0; x <= W; x += CELL) { ctx.moveTo(x + .5, 0); ctx.lineTo(x + .5, H); }
       for (let y = 0; y <= H; y += CELL) { ctx.moveTo(0, y + .5); ctx.lineTo(W, y + .5); }
       ctx.stroke();
@@ -194,8 +224,8 @@ const WEB3FORMS_KEY = '';                   // только для режима 
       // укрытия
       for (const o of OB) {
         const x = o.x * W, y = o.y * H, w = o.w * W, h = o.h * H;
-        ctx.fillStyle = 'rgba(235,233,228,.045)'; ctx.fillRect(x, y, w, h);
-        ctx.strokeStyle = 'rgba(235,233,228,.22)'; ctx.strokeRect(x + .5, y + .5, w, h);
+        ctx.fillStyle = 'rgba(' + INK + ',.045)'; ctx.fillRect(x, y, w, h);
+        ctx.strokeStyle = 'rgba(' + INK + ',.22)'; ctx.strokeRect(x + .5, y + .5, w, h);
       }
       // мишени
       const pulse = reduce ? 0 : (Math.sin(now / 520) + 1) / 2;
@@ -203,28 +233,28 @@ const WEB3FORMS_KEY = '';                   // только для режима 
         const x = t.x * W, y = t.y * H;
         if (t.flash > 0) t.flash = Math.max(0, t.flash - .03);
         const off = t.off > 0;
-        ctx.strokeStyle = off ? 'rgba(255,74,28,' + (.2 + t.flash * .8) + ')' : 'rgba(235,233,228,.5)';
+        ctx.strokeStyle = off ? 'rgba(' + HOT + ',' + (.2 + t.flash * .8) + ')' : 'rgba(' + INK + ',.5)';
         ctx.lineWidth = 1.2;
         ctx.beginPath(); ctx.arc(x, y, 7, 0, 6.2832); ctx.stroke();
         if (!off) {
-          ctx.strokeStyle = 'rgba(255,74,28,' + (.15 + pulse * .25) + ')';
+          ctx.strokeStyle = 'rgba(' + SIG + ',' + (.2 + pulse * .3) + ')';
           ctx.beginPath(); ctx.arc(x, y, 12 + pulse * 5, 0, 6.2832); ctx.stroke();
-          ctx.fillStyle = 'rgba(255,74,28,.9)'; ctx.beginPath(); ctx.arc(x, y, 2, 0, 6.2832); ctx.fill();
+          ctx.fillStyle = 'rgba(' + SIG + ',.95)'; ctx.beginPath(); ctx.arc(x, y, 2, 0, 6.2832); ctx.fill();
         } else if (t.flash > 0) {
-          ctx.fillStyle = 'rgba(255,74,28,' + t.flash * .5 + ')'; ctx.beginPath(); ctx.arc(x, y, 7 + (1 - t.flash) * 22, 0, 6.2832); ctx.fill();
+          ctx.fillStyle = 'rgba(' + HOT + ',' + t.flash * .5 + ')'; ctx.beginPath(); ctx.arc(x, y, 7 + (1 - t.flash) * 22, 0, 6.2832); ctx.fill();
         }
       }
       // тагер
       const [ox, oy] = origin();
-      ctx.strokeStyle = 'rgba(235,233,228,.7)'; ctx.lineWidth = 1.2; ctx.strokeRect(ox - 7, oy - 7, 14, 14);
-      ctx.fillStyle = '#ff4a1c'; ctx.fillRect(ox - 2, oy - 2, 4, 4);
+      ctx.strokeStyle = 'rgba(' + INK + ',.7)'; ctx.lineWidth = 1.2; ctx.strokeRect(ox - 7, oy - 7, 14, 14);
+      ctx.fillStyle = 'rgb(' + SIG + ')'; ctx.fillRect(ox - 2, oy - 2, 4, 4);
       text('ТАГЕР', ox - 17, oy + 14, .45);
       // прицел
       if (mouse) {
         const r = trace(ox, oy, mouse[0], mouse[1]);
-        ctx.setLineDash([4, 6]); ctx.strokeStyle = 'rgba(255,74,28,.4)'; ctx.lineWidth = 1;
+        ctx.setLineDash([4, 6]); ctx.strokeStyle = 'rgba(' + SIG + ',.45)'; ctx.lineWidth = 1;
         ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(r.x, r.y); ctx.stroke(); ctx.setLineDash([]);
-        ctx.strokeStyle = 'rgba(235,233,228,.8)';
+        ctx.strokeStyle = 'rgba(' + INK + ',.8)';
         ctx.beginPath(); ctx.arc(mouse[0], mouse[1], 9, 0, 6.2832);
         ctx.moveTo(mouse[0] - 15, mouse[1]); ctx.lineTo(mouse[0] - 5, mouse[1]); ctx.moveTo(mouse[0] + 5, mouse[1]); ctx.lineTo(mouse[0] + 15, mouse[1]);
         ctx.moveTo(mouse[0], mouse[1] - 15); ctx.lineTo(mouse[0], mouse[1] - 5); ctx.moveTo(mouse[0], mouse[1] + 5); ctx.lineTo(mouse[0], mouse[1] + 15);
@@ -235,17 +265,17 @@ const WEB3FORMS_KEY = '';                   // только для режима 
       beams = beams.filter(b => now - b.t < 320);
       for (const b of beams) {
         const a = 1 - (now - b.t) / 320;
-        ctx.strokeStyle = 'rgba(255,74,28,' + a + ')'; ctx.lineWidth = 2 * a + .5;
-        ctx.shadowColor = '#ff4a1c'; ctx.shadowBlur = 12 * a;
+        ctx.strokeStyle = 'rgba(' + SIG + ',' + a + ')'; ctx.lineWidth = 2 * a + .5;
+        ctx.shadowColor = 'rgb(' + SIG + ')'; ctx.shadowBlur = 12 * a;
         ctx.beginPath(); ctx.moveTo(b.x0, b.y0); ctx.lineTo(b.x1, b.y1); ctx.stroke();
         ctx.shadowBlur = 0;
       }
       sparks = sparks.filter(s => now - s.t < 500);
       for (const s of sparks) {
         const k = (now - s.t) / 500;
-        ctx.strokeStyle = s.hit ? 'rgba(255,74,28,' + (1 - k) + ')' : 'rgba(235,233,228,' + (.7 * (1 - k)) + ')';
+        ctx.strokeStyle = s.hit ? 'rgba(' + HOT + ',' + (1 - k) + ')' : 'rgba(' + INK + ',' + (.7 * (1 - k)) + ')';
         ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(s.x, s.y, 4 + k * 16, 0, 6.2832); ctx.stroke();
-        if (s.hit) text('ПОПАДАНИЕ', s.x + 16, s.y - 6, 1 - k);
+        if (s.hit) text('ПОПАДАНИЕ', s.x + 16, s.y - 6, 1 - k, HOT);
       }
       // автодемонстрация, пока человек не стрелял
       if (!reduce && now - lastUser > 2600 && now - lastAuto > 2200 && W > 0) {
@@ -258,7 +288,7 @@ const WEB3FORMS_KEY = '';                   // только для режима 
     requestAnimationFrame(frame);
   })();
 
-  /* ---------- вкладки полигонов ---------- */
+  /* ---------- вкладки локаций ---------- */
   const tabs = $$('.loc-tab'), panels = $$('.loc');
   function sel(i, focus) {
     tabs.forEach((t, j) => {
@@ -275,32 +305,180 @@ const WEB3FORMS_KEY = '';                   // только для режима 
       else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { e.preventDefault(); sel((i - 1 + n) % n, true); }
     });
   });
-  // превью вкладки: первое фото галереи этой локации (новая локация получает превью автоматически)
-  tabs.forEach((t, j) => {
-    const im = panels[j] && panels[j].querySelector('.gal img');
-    if (im) t.style.setProperty('--thumb', 'url("' + im.getAttribute('src') + '")');
+  // ---------- плитки-навигация под первым экраном ----------
+  // картинка: data-from="#id" (первое фото галереи блока) или data-thumb="путь"; раскладка по строкам без пустых мест
+  const hubBox = $('#hubGrid'), hubTiles = hubBox ? $$('.hub-tile', hubBox) : [];
+  function hubThumbs() {                                    // повторяется после подгрузки автогалерей (событие galfill)
+    hubTiles.forEach(t => {
+      if (t.hasAttribute('data-has-thumb')) return;
+      let src = t.dataset.thumb || '';
+      if (!src && t.dataset.from) { const im = $('.gal img', $(t.dataset.from) || document); if (im) src = im.getAttribute('src'); }
+      if (src) { t.style.setProperty('--thumb', 'url("' + src + '")'); t.setAttribute('data-has-thumb', ''); }
+    });
+  }
+  hubThumbs(); document.addEventListener('galfill', hubThumbs);
+  hubTiles.forEach(t => {
+    if (t.dataset.loc) t.addEventListener('click', () => { const i = tabs.findIndex(x => x.id === 't-' + t.dataset.loc); if (i >= 0) sel(i); });
   });
-  // раскладка плиток-вкладок: в последней строке всегда 2+ плитки, пустых мест нет
-  // 5 → 2+3, 6 → 3+3, 7 → 3+4; нижние строки получают лишнюю плитку. Максимум в строке зависит от ширины.
-  const tabBox = tabs.length ? tabs[0].parentElement : null;
-  function layoutTabs() {
-    if (!tabBox) return;
-    const n = tabs.length, W = tabBox.clientWidth, gap = 8, minW = innerWidth <= 960 ? 150 : 220;
+  // 9 → 3+3+3, 8 → 4+4, 7 → 3+4, 6 → 3+3, 5 → 2+3 (лишняя плитка достаётся нижним строкам); максимум в строке зависит от ширины
+  function layoutHub() {
+    if (!hubBox || !hubTiles.length) return;
+    const n = hubTiles.length, W = hubBox.clientWidth, gap = 8, minW = innerWidth <= 560 ? 140 : innerWidth <= 960 ? 190 : 230;
     const max = Math.max(1, Math.min(4, Math.floor((W + gap) / (minW + gap))));
     const rows = Math.ceil(n / max), base = Math.floor(n / rows), extra = n % rows;
     const counts = []; for (let r = 0; r < rows; r++) counts.push(base + (r >= rows - extra ? 1 : 0));
     const gcd = (a, b) => b ? gcd(b, a % b) : a, lcm = (a, b) => a * b / gcd(a, b);
     const L = counts.reduce(lcm, 1);
-    tabBox.style.gridTemplateColumns = 'repeat(' + L + ',minmax(0,1fr))';
+    hubBox.style.gridTemplateColumns = 'repeat(' + L + ',minmax(0,1fr))';
     let k = 0;
-    counts.forEach(c => { for (let j = 0; j < c; j++) tabs[k++].style.gridColumn = 'span ' + (L / c); });
+    counts.forEach(c => { for (let j = 0; j < c; j++) hubTiles[k++].style.gridColumn = 'span ' + (L / c); });
   }
-  layoutTabs();
-  let ltT; window.addEventListener('resize', () => { clearTimeout(ltT); ltT = setTimeout(layoutTabs, 60); });
+  layoutHub();
+  let hubT; window.addEventListener('resize', () => { clearTimeout(hubT); hubT = setTimeout(layoutHub, 60); });
   if (tabs.length) sel(0);
+  // ссылка на конкретную локацию (index.html#loc-dav, в том числе со страницы «О клубе») открывает нужную вкладку
+  function hashTab() {
+    const id = decodeURIComponent(location.hash.slice(1)), el = id && document.getElementById(id), pn = el && el.closest('.loc');
+    const i = pn ? panels.indexOf(pn) : -1;
+    if (i >= 0) { sel(i); el.scrollIntoView(); }
+  }
+  hashTab(); addEventListener('hashchange', hashTab);
 
-  /* ---------- галерея: «прицел» и просмотр ---------- */
-  const galLinks = $$('.gal a');
+  /* ---------- галерея: автоподбор фото, ровная раскладка, «прицел» и просмотр ---------- */
+  // Сколько фото показывать в блоке на главной и «О клубе». Для одного блока своё число: data-limit="4" или data-limit="all" у <ul class="gal">
+  const GAL_LIMIT = 6;
+  const GAL_DIR = 'img/', GAL_THUMBS = 'img/thumbs/';
+  // Подписи на кадрах (по имени файла). Нужна подпись к другому фото: добавьте строку 'имя-файла.jpg': 'подпись'
+  const GAL_CAPS = {
+    'bunker-01.jpg': 'игровая зона', 'bunker-04.jpg': 'Штаб',
+    'davydkovo-01.jpg': 'игровая зона', 'davydkovo-04.jpg': 'Дом сказок',
+    'party-01.jpg': 'квест', 'party-04.jpg': 'застолье',
+    'gear-01.jpg': 'тагер', 'gear-04.jpg': 'лазерный тир'
+  };
+  const httpMode = location.protocol !== 'file:' && !!window.fetch;
+  const galName = (p, i) => p + '-' + String(i).padStart(2, '0') + '.jpg';
+  const imgOk = url => new Promise(res => { const im = new Image(); im.onload = () => res(true); im.onerror = () => res(false); im.src = url; });
+  // есть ли файл: по HEAD-запросу (без скачивания фото); на file:// и там, где HEAD запрещён, пробуем загрузить как картинку
+  function galExists(url) {
+    if (!httpMode) return imgOk(url);
+    return fetch(url, { method: 'HEAD', cache: 'no-cache' })
+      .then(r => r.status === 405 ? imgOk(url) : (r.ok && /^image\//i.test(r.headers.get('content-type') || 'image/')))
+      .catch(() => false);
+  }
+  // способ 1 (есть PHP): list.php отдаёт список имён одним запросом; способ 2 (PHP нет): перебор prefix-01.jpg, -02… до трёх пропусков подряд
+  function phpList(prefixes) {
+    if (!httpMode) return Promise.resolve(null);
+    return fetch('list.php?prefix=' + encodeURIComponent(prefixes.join(',')), { cache: 'no-cache' })
+      .then(r => r.ok ? r.json() : null)
+      .then(j => (j && typeof j === 'object' && !Array.isArray(j)) ? j : null)
+      .catch(() => null);
+  }
+  async function galProbe(prefix, need) {
+    const out = []; let miss = 0, n = 1;
+    while (miss < 3 && n < 400 && out.length < need) {
+      const batch = []; for (let k = 0; k < 6; k++) batch.push(n++);
+      const res = await Promise.all(batch.map(i => galExists(GAL_DIR + galName(prefix, i))));
+      for (let k = 0; k < batch.length && miss < 3 && out.length < need; k++) {
+        if (res[k]) { out.push(galName(prefix, batch[k])); miss = 0; } else miss++;
+      }
+    }
+    return out;
+  }
+  const autoGals = $$('.gal[data-auto]');
+  const galPrefixes = g => g.dataset.auto.split(',').map(s => s.trim()).filter(Boolean);
+  const phpData = autoGals.length ? phpList(Array.from(new Set(autoGals.flatMap(galPrefixes)))) : null;
+  const galNames = (p, need) => phpData.then(d => (d && Array.isArray(d[p])) ? d[p] : galProbe(p, need));
+  // миниатюра из img/thumbs/, если её нет — само фото; заодно берём размеры кадра
+  function galLoad(name) {
+    return new Promise(res => {
+      const ok = (im, src) => res(im.naturalWidth ? { src: src, w: im.naturalWidth, h: im.naturalHeight } : null);
+      const t = new Image();
+      t.onload = () => ok(t, GAL_THUMBS + name);
+      t.onerror = () => { const f = new Image(); f.onload = () => ok(f, GAL_DIR + name); f.onerror = () => res(null); f.src = GAL_DIR + name; };
+      t.src = GAL_THUMBS + name;
+    });
+  }
+  // ровная раскладка рядами: каждый ряд ровно по ширине блока, высота ряда подбирается (динамическое программирование),
+  // поэтому слева и справа края гладкие при любых пропорциях снимков, а нижний ряд тоже заполнен
+  function galLayout(ul) {
+    const W = ul.clientWidth;
+    if (W < 40) return;                                   // блок скрыт (вкладка): раскладка сделается при показе
+    const lis = Array.from(ul.children).filter(x => x.tagName === 'LI' && x._r);
+    if (!lis.length || (ul._w === W && ul._n === lis.length)) return;
+    ul._w = W; ul._n = lis.length;
+    const gap = 6, H = W < 480 ? 120 : W < 800 ? 170 : 220, n = lis.length, r = lis.map(x => x._r);
+    const hOf = (i, j) => { let s = 0; for (let k = i; k < j; k++) s += r[k]; return (W - gap * (j - i - 1)) / s; };
+    const best = new Array(n + 1).fill(Infinity), prev = new Array(n + 1).fill(0); best[0] = 0;
+    for (let j = 1; j <= n; j++) for (let i = Math.max(0, j - 10); i < j; i++) {
+      const h = hOf(i, j), d = (h - H) / H;                // слишком низкий ряд (мелкие кадры) наказывается сильнее высокого
+      const c = best[i] + (d < 0 ? 3 * d * d + (h < H * 0.8 ? 5 : 0) : d * d) + 0.03;
+      if (c < best[j]) { best[j] = c; prev[j] = i; }
+    }
+    const rows = []; for (let j = n; j > 0; j = prev[j]) rows.unshift([prev[j], j]);
+    let y = 0;
+    rows.forEach(([i, j]) => {
+      const cnt = j - i; let h = hOf(i, j), rowW = W, off = 0;
+      if (h > H * 1.9) {                                  // 1–2 фото в ряду: не растягиваем на всю ширину, центруем
+        h = H * 1.9; let s = 0; for (let k = i; k < j; k++) s += r[k];
+        rowW = Math.round(h * s + gap * (cnt - 1)); off = Math.round((W - rowW) / 2);
+      }
+      const hh = Math.round(h), avail = rowW - gap * (cnt - 1);
+      let s = 0; for (let k = i; k < j; k++) s += r[k];
+      let acc = 0, prevX = 0;
+      for (let k = i; k < j; k++) {
+        acc += r[k]; const x = k === j - 1 ? avail : Math.round(acc / s * avail);
+        const li = lis[k];
+        li.style.left = (off + prevX + gap * (k - i)) + 'px'; li.style.top = y + 'px';
+        li.style.width = (x - prevX) + 'px'; li.style.height = hh + 'px';
+        prevX = x;
+      }
+      y += hh + gap;
+    });
+    ul.style.height = (y - gap) + 'px';
+  }
+  const galRO = window.ResizeObserver ? new ResizeObserver(es => es.forEach(e => galLayout(e.target))) : null;
+  if (!galRO) addEventListener('resize', () => $$('.gal--j').forEach(galLayout));
+
+  async function galFill(ul) {
+    const prefixes = galPrefixes(ul), title = ul.dataset.gal || '';
+    const lim = ul.dataset.limit === 'all' ? Infinity : (parseInt(ul.dataset.limit, 10) || GAL_LIMIT);
+    ul.classList.add('gal--j', 'is-loading');
+    const stat = Array.from(ul.children).filter(x => x.tagName === 'LI');      // готовые плитки (видео) остаются в начале
+    stat.forEach(li => { const q = ($('a', li).dataset.ratio || '16/9').split('/'); li._r = (+q[0] || 16) / (+q[1] || 9); });
+    let list = [];
+    for (const p of prefixes) {
+      if (list.length > lim) break;
+      (await galNames(p, lim === Infinity ? Infinity : lim + 1 - list.length)).forEach(nm => list.push(nm));
+    }
+    const more = list.length > lim;
+    list = list.slice(0, lim);
+    const loaded = (await Promise.all(list.map(galLoad)));
+    const lis = [];
+    loaded.forEach((r, k) => {
+      if (!r) return;
+      const name = list[k], cap = GAL_CAPS[name];
+      const li = document.createElement('li'), a = document.createElement('a'), im = document.createElement('img');
+      a.href = GAL_DIR + name; if (cap) a.dataset.cap = cap;
+      im.src = r.src; im.alt = 'Фото: ' + (cap ? title + ', ' + cap : title); im.decoding = 'async';
+      a.appendChild(im); li.appendChild(a); li._r = r.w / r.h; lis.push(li);
+    });
+    lis.forEach(li => ul.appendChild(li));
+    ul.classList.remove('is-loading');
+    if (!lis.length && !stat.length) {                                          // фото нет: прячем весь блок
+      (ul.closest('[data-gal-sec]') || ul.closest('.galw') || ul).hidden = true;
+      galPrefixes(ul).forEach(p => $$('[data-chip="' + p + '"]').forEach(c => { c.hidden = true; }));
+    } else {
+      if (more && !ul.hasAttribute('data-nomore')) {
+        const m = document.createElement('p'); m.className = 'more gal-more';
+        const a = document.createElement('a'); a.href = ul.dataset.more || ('gallery.html#' + prefixes[0]);
+        a.innerHTML = 'Все фото в галерее <i>→</i>'; m.appendChild(a); ul.insertAdjacentElement('afterend', m);
+      }
+      galLayout(ul); bindGal(ul);
+      if (galRO) galRO.observe(ul);
+    }
+    document.dispatchEvent(new CustomEvent('galfill', { detail: ul }));
+  }
+
   // видео ВКонтакте: принимает ссылку video_ext.php (из «Экспорт → код для вставки») или обычную ссылку vk.com/video-123_456
   function vkEmbed(href) {
     try {
@@ -313,9 +491,10 @@ const WEB3FORMS_KEY = '';                   // только для режима 
       return 'https://vk.com/video_ext.php?oid=' + oid + '&id=' + id + (hash ? '&hash=' + hash : '') + '&hd=2&autoplay=1';
     } catch (e) { return ''; }
   }
-  $$('.gal').forEach(g => {
+  function bindGal(g) {
     const items = $$('a', g);
     items.forEach((a, i) => {
+      if (a._bound) return; a._bound = true;
       const isV = a.hasAttribute('data-video');
       if (isV) {
         a.dataset.embed = vkEmbed(a.getAttribute('href'));
@@ -340,9 +519,15 @@ const WEB3FORMS_KEY = '';                   // только для режима 
       a.addEventListener('pointerleave', off);
       a.addEventListener('pointercancel', off);
       a.addEventListener('pointerup', e => { if (e.pointerType === 'touch') setTimeout(off, 350); });
-      a.addEventListener('click', e => { e.preventDefault(); openLb(items, i, g.dataset.gal || ''); });
+      a.addEventListener('click', e => { e.preventDefault(); openLb($$('a', g), $$('a', g).indexOf(a), g.dataset.gal || ''); });
     });
-  });
+  }
+  $$('.gal:not([data-auto])').forEach(bindGal);
+  if (autoGals.length) {
+    Promise.all(autoGals.map(galFill)).then(() => {
+      if (location.hash.length > 1) { const t = document.getElementById(decodeURIComponent(location.hash.slice(1))); if (t) t.scrollIntoView(); }
+    });
+  }
   $$('.gal-mode').forEach(b => b.addEventListener('click', () => {
     const w = b.closest('.galw'), on = !w.classList.contains('is-color');
     w.classList.toggle('is-color', on);
