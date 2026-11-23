@@ -688,7 +688,7 @@ const WEB3FORMS_KEY = '';                   // только для режима 
     try {
       const r = await fetch(FORM_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(payload), signal: ac.signal });
       let j = {}; try { j = await r.json(); } catch (_) {}
-      if (r.ok && j.ok !== false && j.success !== false) { say('Спасибо! Мы свяжемся с вами в ближайшее время.', 'ok'); form.reset(); }
+      if (r.ok && j.ok !== false && j.success !== false) { say('Спасибо! Мы свяжемся с Вами в ближайшее время.', 'ok'); form.reset(); }
       else if (r.status === 422 || r.status === 429) say(j.error || j.message || 'Проверьте данные и попробуйте позже.', 'err');
       else say('Не удалось отправить. Позвоните или напишите нам: 8 (977) 316-15-16, ' + FORM_EMAIL, 'err');
     } catch (_) {
