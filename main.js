@@ -4,9 +4,9 @@
    2) 'send.php'                           — свой обработчик на хостинге с PHP (файл send.php из архива)
    3) 'https://api.web3forms.com/submit'   — сервис Web3Forms, нужен ключ в WEB3FORMS_KEY
    В режиме 2 адрес получателя задаётся в send.php (массив $CONFIG), в режиме 3 — при получении ключа на сайте Web3Forms. */
-const FORM_ENDPOINT = 'https://api.web3forms.com/submit';
-const FORM_EMAIL = '9773161516@mail.ru';  // ЗАМЕНИТЬ: показывается в сообщении об ошибке и используется в режиме 1
-const WEB3FORMS_KEY = '77626781-af43-48f1-aee5-c5076c7de741';                   // только для режима 3
+const FORM_ENDPOINT = '';
+const FORM_EMAIL = 'info@your-domain.ru';  // ЗАМЕНИТЬ: показывается в сообщении об ошибке и используется в режиме 1
+const WEB3FORMS_KEY = '';                   // только для режима 3
 
 (function () {
   'use strict';
@@ -393,13 +393,8 @@ const WEB3FORMS_KEY = '77626781-af43-48f1-aee5-c5076c7de741';                   
   // Сколько фото показывать в блоке на главной и «О клубе». Для одного блока своё число: data-limit="4" или data-limit="all" у <ul class="gal">
   const GAL_LIMIT = 6;
   const GAL_DIR = 'img/', GAL_THUMBS = 'img/thumbs/';
-  // Подписи на кадрах (по имени файла). Нужна подпись к другому фото: добавьте строку 'имя-файла.jpg': 'подпись'
-  const GAL_CAPS = {
-    'bunker-01.jpg': 'игровая зона', 'bunker-04.jpg': 'Штаб',
-    'davydkovo-01.jpg': 'игровая зона', 'davydkovo-04.jpg': 'Дом сказок',
-    'party-01.jpg': 'квест', 'party-04.jpg': 'застолье',
-    'gear-01.jpg': 'тагер', 'gear-04.jpg': 'лазерный тир'
-  };
+  // Подписи на кадрах (по имени файла) берутся из captions.js: правятся утилитой gallery-tool.bat (часть 6) или вручную по образцу в самом файле.
+  const GAL_CAPS = window.GAL_CAPS || {};   // подписи к фото лежат в captions.js (правятся утилитой, часть 6)
   const httpMode = location.protocol !== 'file:' && !!window.fetch;
   const galName = (p, i) => p + '-' + String(i).padStart(2, '0') + '.jpg';
   const imgOk = url => new Promise(res => { const im = new Image(); im.onload = () => res(true); im.onerror = () => res(false); im.src = url; });
@@ -552,7 +547,10 @@ const WEB3FORMS_KEY = '77626781-af43-48f1-aee5-c5076c7de741';                   
       const poster = isV ? ($('img', a) ? $('img', a).getAttribute('src') : '') : a.getAttribute('href');
       if (poster) a.style.setProperty('--src', 'url("' + poster + '")');
       const c = document.createElement('span'); c.className = 'cap';
-      c.innerHTML = '<b>' + String(i + 1).padStart(2, '0') + '</b>' + (a.dataset.cap ? ' · ' + a.dataset.cap : '');
+      // номер на кадре = номер файла (bunker-05.jpg -> 05), чтобы совпадало с папкой сайта и с утилитой; у видео вместо номера значок ▶
+      const fm = /-(\d+)\.jpg(?:\?|$)/i.exec(a.getAttribute('href') || '');
+      const num = isV ? '▶' : fm ? String(parseInt(fm[1], 10)).padStart(2, '0') : String(i + 1).padStart(2, '0');
+      c.innerHTML = '<b>' + num + '</b>' + (a.dataset.cap ? ' · ' + a.dataset.cap : '');
       a.appendChild(c);
       const lens = e => {
         const r = a.getBoundingClientRect(), up = e.pointerType === 'touch' ? 46 : 0;   // на телефоне прицел выше пальца
