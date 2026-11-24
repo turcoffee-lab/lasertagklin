@@ -118,13 +118,23 @@ const WEB3FORMS_KEY = '';                   // только для режима 
     const SIG = '95,224,47', HOT = '255,90,28', INK = '234,240,228';   // палитра из логотипа: зелёный луч, оранжевые попадания
     let W = 0, H = 0, dpr = 1, mouse = null, shots = 0, hits = 0, beams = [], sparks = [], lastUser = 0, visible = true, lastAuto = 0, lastT = 0;
     const CELL = 64;
+    /* Экономия ресурсов: кадров не больше 30 в секунду, разрешение canvas не выше 1.5×, цикл стоит, пока первый экран не виден,
+       вкладка скрыта или игра выключена кнопкой «Игра» рядом со счётчиком в первом экране. Выбор посетителя хранится в localStorage (ключ lt-game). */
+    const FRAME_MS = 1000 / 30, DPR_MAX = 1.5, KEY = 'lt-game';
+    const tgl = $('.gtgl');
+    let raf = 0, tabVis = !document.hidden, lastDraw = 0, ready = false;
+    const saved = (() => { try { return localStorage.getItem(KEY); } catch (_) { return null; } })();
+    const weak = reduce || (navigator.connection && navigator.connection.saveData) ||
+      (navigator.deviceMemory && navigator.deviceMemory <= 2) || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 2);
+    let on = saved === 'on' ? true : saved === 'off' ? false : !weak;   // без выбора: включено, кроме слабых устройств и «уменьшить движение»
 
     function resize() {
       const r = hero.getBoundingClientRect();
-      dpr = Math.min(2, devicePixelRatio || 1);
+      dpr = Math.min(DPR_MAX, devicePixelRatio || 1);
       W = r.width; H = r.height;
       cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      if (!on && ready) render(performance.now());   // игра выключена: после смены размера рисуем статичный кадр
     }
     resize();
     if ('ResizeObserver' in window) new ResizeObserver(resize).observe(hero); else addEventListener('resize', resize);
@@ -142,7 +152,6 @@ const WEB3FORMS_KEY = '';                   // только для режима 
     }
     function step(now) {
       const dt = lastT ? Math.min(.05, (now - lastT) / 1000) : 0; lastT = now;
-      if (reduce) return;
       const t = now / 1000;
       for (const o of OB) { o.x = o.bx + o.ax * Math.sin(t * o.sp + o.ph); o.y = o.by + o.ay * Math.cos(t * o.sp * .8 + o.ph); }
       const P = 12;                                    // радиус цели: цель не заходит в укрытия
@@ -198,20 +207,19 @@ const WEB3FORMS_KEY = '';                   // только для режима 
     }
     function pos(e) { const r = cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
 
-    hero.addEventListener('pointermove', e => { mouse = pos(e); });
+    hero.addEventListener('pointermove', e => { if (on) mouse = pos(e); });
     hero.addEventListener('pointerleave', () => { mouse = null; });
     hero.addEventListener('pointerdown', e => {
-      if (e.target.closest('a,button')) return;
+      if (!on || e.target.closest('a,button')) return;
       const p = pos(e); mouse = p; lastUser = performance.now();
       shoot(p[0], p[1], true);
     });
-    new IntersectionObserver(es => { visible = es[0].isIntersecting; if (visible) requestAnimationFrame(frame); }).observe(hero);
+    new IntersectionObserver(es => { visible = es[0].isIntersecting; kick(); }).observe(hero);
 
     function text(s, x, y, a, c) { ctx.fillStyle = 'rgba(' + (c || INK) + ',' + a + ')'; ctx.fillText(s, x, y); }
 
-    function frame(now) {
-      if (!visible) { lastT = 0; return; }
-      step(now);
+    function render(now) {
+      if (on) step(now);
       ctx.clearRect(0, 0, W, H);
       // сетка
       ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(' + INK + ',.055)'; ctx.beginPath();
@@ -228,7 +236,7 @@ const WEB3FORMS_KEY = '';                   // только для режима 
         ctx.strokeStyle = 'rgba(' + INK + ',.22)'; ctx.strokeRect(x + .5, y + .5, w, h);
       }
       // мишени
-      const pulse = reduce ? 0 : (Math.sin(now / 520) + 1) / 2;
+      const pulse = !on ? 0 : (Math.sin(now / 520) + 1) / 2;
       for (const t of TG) {
         const x = t.x * W, y = t.y * H;
         if (t.flash > 0) t.flash = Math.max(0, t.flash - .03);
@@ -265,10 +273,9 @@ const WEB3FORMS_KEY = '';                   // только для режима 
       beams = beams.filter(b => now - b.t < 320);
       for (const b of beams) {
         const a = 1 - (now - b.t) / 320;
-        ctx.strokeStyle = 'rgba(' + SIG + ',' + a + ')'; ctx.lineWidth = 2 * a + .5;
-        ctx.shadowColor = 'rgb(' + SIG + ')'; ctx.shadowBlur = 12 * a;
-        ctx.beginPath(); ctx.moveTo(b.x0, b.y0); ctx.lineTo(b.x1, b.y1); ctx.stroke();
-        ctx.shadowBlur = 0;
+        ctx.beginPath(); ctx.moveTo(b.x0, b.y0); ctx.lineTo(b.x1, b.y1);
+        ctx.strokeStyle = 'rgba(' + SIG + ',' + a * .22 + ')'; ctx.lineWidth = 7 * a + 1; ctx.stroke();   // «свечение» без дорогого shadowBlur
+        ctx.strokeStyle = 'rgba(' + SIG + ',' + a + ')'; ctx.lineWidth = 2 * a + .5; ctx.stroke();
       }
       sparks = sparks.filter(s => now - s.t < 500);
       for (const s of sparks) {
@@ -278,14 +285,52 @@ const WEB3FORMS_KEY = '';                   // только для режима 
         if (s.hit) text('ПОПАДАНИЕ', s.x + 16, s.y - 6, 1 - k, HOT);
       }
       // автодемонстрация, пока человек не стрелял
-      if (!reduce && now - lastUser > 2600 && now - lastAuto > 2200 && W > 0) {
+      if (on && now - lastUser > 2600 && now - lastAuto > 2200 && W > 0) {
         const act = TG.filter(t => !t.off);
         if (act.length) { const t = act[Math.floor(Math.random() * act.length)]; shoot(t.x * W, t.y * H, false); }
         lastAuto = now;
       }
-      requestAnimationFrame(frame);
     }
-    requestAnimationFrame(frame);
+    function loop(now) {
+      raf = 0;
+      if (!on || !visible || !tabVis) { lastT = 0; return; }
+      if (now - lastDraw >= FRAME_MS - 2) { lastDraw = now; render(now); }
+      raf = requestAnimationFrame(loop);
+    }
+    function kick() { if (!raf && on && visible && tabVis) raf = requestAnimationFrame(loop); }
+    function setOn(v, save) {
+      on = v;
+      hero.classList.toggle('game-off', !v);
+      if (tgl) {
+        tgl.setAttribute('aria-checked', String(v));
+      }
+      if (save) { try { localStorage.setItem(KEY, v ? 'on' : 'off'); } catch (_) {} }
+      if (v) { lastUser = performance.now(); kick(); }
+      else {
+        if (raf) { cancelAnimationFrame(raf); raf = 0; }
+        mouse = null; beams = []; sparks = []; lastT = 0;
+        render(performance.now());                        // один статичный кадр: поле остаётся на месте, но не движется
+      }
+    }
+    if (tgl) tgl.addEventListener('click', () => setOn(!on, true));
+    document.addEventListener('visibilitychange', () => { tabVis = !document.hidden; kick(); });
+    ready = true;
+    setOn(on, false);
+  })();
+
+  /* ---------- бесконечные CSS-анимации идут только пока видны на экране ---------- */
+  (function pauseOffscreen() {
+    if (!('IntersectionObserver' in window) || !document.getAnimations) return;
+    const map = new Map();
+    document.getAnimations().forEach(a => {
+      const e = a.effect, t = e && e.target;
+      if (!t || !e.getComputedTiming || e.getComputedTiming().iterations !== Infinity) return;
+      if (!map.has(t)) map.set(t, []);
+      map.get(t).push(a);
+    });
+    if (!map.size) return;
+    const io = new IntersectionObserver(es => es.forEach(en => (map.get(en.target) || []).forEach(a => { try { en.isIntersecting ? a.play() : a.pause(); } catch (_) {} })));
+    map.forEach((_, t) => io.observe(t));
   })();
 
   /* ---------- вкладки локаций ---------- */
@@ -511,9 +556,10 @@ const WEB3FORMS_KEY = '';                   // только для режима 
       a.appendChild(c);
       const lens = e => {
         const r = a.getBoundingClientRect(), up = e.pointerType === 'touch' ? 46 : 0;   // на телефоне прицел выше пальца
+        a.classList.add('is-lens');                       // слои прицела существуют только у кадра под курсором или пальцем
         a.style.setProperty('--mx', (e.clientX - r.left) + 'px'); a.style.setProperty('--my', (e.clientY - r.top - up) + 'px');
       };
-      const off = () => { a.style.setProperty('--mx', '-999px'); a.style.setProperty('--my', '-999px'); };
+      const off = () => { a.classList.remove('is-lens'); a.style.setProperty('--mx', '-999px'); a.style.setProperty('--my', '-999px'); };
       a.addEventListener('pointerdown', lens);
       a.addEventListener('pointermove', lens);
       a.addEventListener('pointerleave', off);

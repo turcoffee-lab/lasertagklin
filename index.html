@@ -17,7 +17,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500&display=swap&subset=cyrillic">
-<link rel="stylesheet" href="style.css?v=30">
+<link rel="stylesheet" href="style.css?v=33">
 <script>document.documentElement.classList.add('js')</script>
 <script type="application/ld+json">
 {
@@ -61,10 +61,13 @@
 <!-- ============ ГЛАВНЫЙ ЭКРАН ============ -->
 <section class="hero" id="hero">
   <canvas id="field" aria-hidden="true"></canvas>
-  <div class="hud" aria-hidden="true">
-    <div><span>Выстрелов</span><b id="h-shots">0</b></div>
-    <div><span>Попаданий</span><b id="h-hits">0</b></div>
-    <div><span>Точность</span><b id="h-acc">—</b></div>
+  <div class="hudbar">
+    <div class="hud" aria-hidden="true">
+      <div><span>Выстрелов</span><b id="h-shots">0</b></div>
+      <div><span>Попаданий</span><b id="h-hits">0</b></div>
+      <div><span>Точность</span><b id="h-acc">—</b></div>
+    </div>
+    <button class="gtgl" type="button" role="switch" aria-checked="true" aria-label="Игра в первом экране" title="Включить или выключить игру"><span>Игра</span><i class="gtgl__sw" aria-hidden="true"></i></button>
   </div>
   <div class="wrap hero__in">
     <img class="hero__logo" src="img/logo.webp" alt="Логотип лазертаг-клуба «Клинский»: череп на фоне радиационного знака и скрещённых автоматов" width="760" height="609" fetchpriority="high">
@@ -136,8 +139,8 @@
           <div class="galw">
             <div class="gal-tools"><span class="hint-fine">[ наведите: прицел проявляет кадр. Клик: открыть ]</span><span class="hint-touch">[ ведите пальцем по кадру: прицел проявляет его. Касание: открыть ]</span><button class="gal-mode" type="button" aria-pressed="false">Показать в цвете</button></div>
             <ul class="gal" data-gal="Название">
-              <li class="w2 h2"><a href="img/new-01.jpg"><img src="img/new-01.jpg" alt="Описание фото" loading="lazy"></a></li>
-              <li><a href="img/new-02.jpg"><img src="img/new-02.jpg" alt="Описание фото" loading="lazy"></a></li>
+              <li class="w2 h2"><a href="img/new-01.jpg"><img decoding="async" src="img/new-01.jpg" alt="Описание фото" loading="lazy"></a></li>
+              <li><a href="img/new-02.jpg"><img decoding="async" src="img/new-02.jpg" alt="Описание фото" loading="lazy"></a></li>
             </ul>
           </div>
           <div class="loc__cols">
@@ -177,7 +180,7 @@
             <!-- ФОТО подставляются сами: первые 6 из img/bunker-01.jpg, -02 … (число задаёт GAL_LIMIT в main.js или data-limit). Подробности в README, раздел 24 -->
             <!-- ВИДЕО ВКонтакте в галерее: добавьте плитку в любое место списка. Ссылка: либо обычная vk.com/video-123_456, либо src из кода для вставки (video_ext.php...).
                  Обложка: <img> внутри (по желанию; без неё будет тёмная плитка с кнопкой). data-ratio="9/16" для вертикального видео.
-                 <li class="w2"><a href="https://vk.com/video-123_456" data-video data-cap="ролик"><img src="img/video-01.jpg" alt="Видео: игра в Бункере"></a></li> -->
+                 <li class="w2"><a href="https://vk.com/video-123_456" data-video data-cap="ролик"><img decoding="async" src="img/video-01.jpg" alt="Видео: игра в Бункере"></a></li> -->
             <ul class="gal" data-gal="Бункер 13" data-auto="bunker"></ul>
           </div>
 
@@ -239,7 +242,7 @@
               <div class="galw is-color route__ph">
                 <!-- Схема проезда: 1 файл или несколько. Чтобы добавить ещё одну, скопируйте строку <li> и поменяйте имя файла. -->
                 <ul class="gal gal--route" data-gal="Бункер 13 · схема проезда">
-                  <li><a href="img/route-bunker-01.jpg"><img src="img/route-bunker-01.jpg" alt="Схема проезда: Бункер 13" loading="lazy"></a></li>
+                  <li><a href="img/route-bunker-01.jpg"><img decoding="async" src="img/route-bunker-01.jpg" alt="Схема проезда: Бункер 13" loading="lazy"></a></li>
                 </ul>
               </div>
             </div>
@@ -351,7 +354,7 @@
               <div class="galw is-color route__ph">
                 <!-- Схема проезда: 1 файл или несколько. Чтобы добавить ещё одну, скопируйте строку <li> и поменяйте имя файла. -->
                 <ul class="gal gal--route" data-gal="Давыдково Family · схема проезда">
-                  <li><a href="img/route-dav-01.jpg"><img src="img/route-dav-01.jpg" alt="Схема проезда: Давыдково Family" loading="lazy"></a></li>
+                  <li><a href="img/route-dav-01.jpg"><img decoding="async" src="img/route-dav-01.jpg" alt="Схема проезда: Давыдково Family" loading="lazy"></a></li>
                 </ul>
               </div>
             </div>
@@ -374,7 +377,7 @@
           <div class="galw">
             <div class="gal-tools"><span class="hint-fine">[ наведите: прицел проявляет кадр. Клик: открыть ]</span><span class="hint-touch">[ ведите пальцем по кадру: прицел проявляет его. Касание: открыть ]</span><button class="gal-mode" type="button" aria-pressed="false">Показать в цвете</button></div>
             <ul class="gal" data-gal="База отдыха Ультра">
-              <li class="w2 h2"><a href="img/ultra-01.jpg"><img src="img/ultra-01.jpg" alt="Фото: база отдыха Ультра" loading="lazy"></a></li>
+              <li class="w2 h2"><a href="img/ultra-01.jpg"><img decoding="async" src="img/ultra-01.jpg" alt="Фото: база отдыха Ультра" loading="lazy"></a></li>
             </ul>
           </div>
           <div class="loc__cols">
@@ -387,7 +390,7 @@
           <div class="galw">
             <div class="gal-tools"><span class="hint-fine">[ наведите: прицел проявляет кадр. Клик: открыть ]</span><span class="hint-touch">[ ведите пальцем по кадру: прицел проявляет его. Касание: открыть ]</span><button class="gal-mode" type="button" aria-pressed="false">Показать в цвете</button></div>
             <ul class="gal" data-gal="Психбольница 666">
-              <li class="w2 h2"><a href="img/psy-01.jpg"><img src="img/psy-01.jpg" alt="Фото: Психбольница 666" loading="lazy"></a></li>
+              <li class="w2 h2"><a href="img/psy-01.jpg"><img decoding="async" src="img/psy-01.jpg" alt="Фото: Психбольница 666" loading="lazy"></a></li>
             </ul>
           </div>
           <div class="loc__cols">
@@ -492,7 +495,7 @@
             <div class="gal-tools"><span class="hint-fine">[ наведите: прицел проявляет кадр. Клик: открыть ]</span><span class="hint-touch">[ ведите пальцем по кадру: прицел проявляет его. Касание: открыть ]</span><button class="gal-mode" type="button" aria-pressed="false">Показать в цвете</button></div>
             <!-- ФОТО подставляются сами: первые 6 из img/trip-01.jpg, -02 … (README, раздел 24). Плитка видео ниже остаётся первой -->
             <ul class="gal" data-gal="Выезд" data-auto="trip">
-              <li><a href="https://vk.ru/video_ext.php?oid=-133342928&id=456239127&hash=069be5519fba1bd6" data-video data-cap="ролик"><img src="img/video-01.jpg" alt="Видео: игра"></a></li>
+              <li><a href="https://vk.ru/video_ext.php?oid=-133342928&id=456239127&hash=069be5519fba1bd6" data-video data-cap="ролик"><img decoding="async" src="img/video-01.jpg" alt="Видео: игра"></a></li>
             </ul>
           </div>
 
@@ -562,7 +565,7 @@
           <div class="galw">
             <div class="gal-tools"><span class="hint-fine">[ наведите: прицел проявляет кадр. Клик: открыть ]</span><span class="hint-touch">[ ведите пальцем по кадру: прицел проявляет его. Касание: открыть ]</span><button class="gal-mode" type="button" aria-pressed="false">Показать в цвете</button></div>
             <!-- ФОТО подставляются сами: первые 6 из img/party-01.jpg, -02 … (README, раздел 24). Видео ВК добавляется так же, как в разделе «Выезд»:
-                 <li class="w2"><a href="https://vk.ru/video_ext.php?oid=...&id=...&hash=..." data-video data-cap="ролик"><img src="img/party-video-01.jpg" alt="Видео: праздник"></a></li> -->
+                 <li class="w2"><a href="https://vk.ru/video_ext.php?oid=...&id=...&hash=..." data-video data-cap="ролик"><img decoding="async" src="img/party-video-01.jpg" alt="Видео: праздник"></a></li> -->
             <ul class="gal" data-gal="Организация праздников" data-auto="party"></ul>
           </div>
 
@@ -766,7 +769,7 @@
         <div class="galw person__ph">
           <!-- ЗАМЕНИТЬ: портрет руководителя -> img/director.jpg (вертикальное фото 4:5, 800x1000, до 200 КБ) -->
           <ul class="gal gal--solo" data-gal="Руководитель клуба">
-            <li><a href="img/director.jpg"><img src="img/director.jpg" alt="Руководитель клуба" loading="lazy"></a></li>
+            <li><a href="img/director.jpg"><img decoding="async" src="img/director.jpg" alt="Руководитель клуба" loading="lazy"></a></li>
           </ul>
         </div>
         <div class="person__body">
@@ -797,7 +800,7 @@
         <div class="galw person__ph">
           <!-- ЗАМЕНИТЬ: портрет Виктории -> img/staff-01.jpg (вертикальное фото 4:5, 800x1000, до 200 КБ) -->
           <ul class="gal gal--solo" data-gal="Виктория Высоцкая">
-            <li><a href="img/staff-01.jpg"><img src="img/staff-01.jpg" alt="Виктория Высоцкая, ведущая праздников" loading="lazy"></a></li>
+            <li><a href="img/staff-01.jpg"><img decoding="async" src="img/staff-01.jpg" alt="Виктория Высоцкая, ведущая праздников" loading="lazy"></a></li>
           </ul>
         </div>
         <div class="person__body">
@@ -823,7 +826,7 @@
         <div class="galw person__ph">
           <!-- ЗАМЕНИТЬ: фото актёров -> img/staff-02.jpg (вертикальное фото 4:5, 800x1000, до 200 КБ) -->
           <ul class="gal gal--solo" data-gal="Актёры клуба">
-            <li><a href="img/staff-02.jpg"><img src="img/staff-02.jpg" alt="Актёры клуба: зомби, Чумной доктор, аниматоры" loading="lazy"></a></li>
+            <li><a href="img/staff-02.jpg"><img decoding="async" src="img/staff-02.jpg" alt="Актёры клуба: зомби, Чумной доктор, аниматоры" loading="lazy"></a></li>
           </ul>
         </div>
         <div class="person__body">
@@ -870,13 +873,13 @@
         Если у партнёра нет ссылки, замените <a class="pbanner" href="…"> на <span class="pbanner"> и закройте </span> вместо </a>.
       -->
       <ul class="pbanners">
-        <li><a class="pbanner" href="#partners"><span class="pbanner__logo"><img src="img/partner-01.jpg" alt="Ультралайт (ULTRAlight world)" loading="lazy"><span class="pbanner__go" aria-hidden="true">↗</span></span><span class="pbanner__n">Ультралайт</span></a></li>
-        <li><a class="pbanner" href="#partners"><span class="pbanner__logo"><img src="img/partner-02.jpg" alt="Давыдково Family, семейный комплекс отдыха" loading="lazy"><span class="pbanner__go" aria-hidden="true">↗</span></span><span class="pbanner__n">Давыдково Family</span></a></li>
-        <li><a class="pbanner" href="#partners"><span class="pbanner__logo"><img src="img/partner-03.jpg" alt="Партнёр 3" loading="lazy"><span class="pbanner__go" aria-hidden="true">↗</span></span><span class="pbanner__n"><span class="todo">название партнёра</span></span></a></li>
-        <li><a class="pbanner" href="#partners"><span class="pbanner__logo"><img src="img/partner-04.jpg" alt="Торговый квартал, торгово-развлекательный центр" loading="lazy"><span class="pbanner__go" aria-hidden="true">↗</span></span><span class="pbanner__n">Торговый квартал</span></a></li>
-        <li><a class="pbanner" href="#partners"><span class="pbanner__logo"><img src="img/partner-05.jpg" alt="Клуб Инфо, рекламно-издательская группа" loading="lazy"><span class="pbanner__go" aria-hidden="true">↗</span></span><span class="pbanner__n">Клуб Инфо</span></a></li>
-        <li><a class="pbanner" href="#partners"><span class="pbanner__logo"><img src="img/partner-06.jpg" alt="Торговый квартал, торгово-развлекательный центр" loading="lazy"><span class="pbanner__go" aria-hidden="true">↗</span></span><span class="pbanner__n">Торговый квартал</span></a></li>
-        <li><a class="pbanner" href="#partners"><span class="pbanner__logo"><img src="img/partner-07.jpg" alt="Шале, ресторан гриль-бар" loading="lazy"><span class="pbanner__go" aria-hidden="true">↗</span></span><span class="pbanner__n">Шале</span></a></li>
+        <li><a class="pbanner" href="#partners"><span class="pbanner__logo"><img decoding="async" src="img/partner-01.jpg" alt="Ультралайт (ULTRAlight world)" loading="lazy"><span class="pbanner__go" aria-hidden="true">↗</span></span><span class="pbanner__n">Ультралайт</span></a></li>
+        <li><a class="pbanner" href="#partners"><span class="pbanner__logo"><img decoding="async" src="img/partner-02.jpg" alt="Давыдково Family, семейный комплекс отдыха" loading="lazy"><span class="pbanner__go" aria-hidden="true">↗</span></span><span class="pbanner__n">Давыдково Family</span></a></li>
+        <li><a class="pbanner" href="#partners"><span class="pbanner__logo"><img decoding="async" src="img/partner-03.jpg" alt="Партнёр 3" loading="lazy"><span class="pbanner__go" aria-hidden="true">↗</span></span><span class="pbanner__n"><span class="todo">название партнёра</span></span></a></li>
+        <li><a class="pbanner" href="#partners"><span class="pbanner__logo"><img decoding="async" src="img/partner-04.jpg" alt="Торговый квартал, торгово-развлекательный центр" loading="lazy"><span class="pbanner__go" aria-hidden="true">↗</span></span><span class="pbanner__n">Торговый квартал</span></a></li>
+        <li><a class="pbanner" href="#partners"><span class="pbanner__logo"><img decoding="async" src="img/partner-05.jpg" alt="Клуб Инфо, рекламно-издательская группа" loading="lazy"><span class="pbanner__go" aria-hidden="true">↗</span></span><span class="pbanner__n">Клуб Инфо</span></a></li>
+        <li><a class="pbanner" href="#partners"><span class="pbanner__logo"><img decoding="async" src="img/partner-06.jpg" alt="Торговый квартал, торгово-развлекательный центр" loading="lazy"><span class="pbanner__go" aria-hidden="true">↗</span></span><span class="pbanner__n">Торговый квартал</span></a></li>
+        <li><a class="pbanner" href="#partners"><span class="pbanner__logo"><img decoding="async" src="img/partner-07.jpg" alt="Шале, ресторан гриль-бар" loading="lazy"><span class="pbanner__go" aria-hidden="true">↗</span></span><span class="pbanner__n">Шале</span></a></li>
       </ul>
       <div class="pnote">
         <span>Площадки, базы отдыха, агентства праздников. Бартер, взаимная реклама.</span>
@@ -948,11 +951,11 @@
 
 <footer class="foot">
   <div class="wrap foot__in">
-    <p class="foot__brand"><img src="img/logo-sm.webp" alt="" width="55" height="44" loading="lazy"><span>© Клуб лазертага «Клинский»</span></p>
+    <p class="foot__brand"><img decoding="async" src="img/logo-sm.webp" alt="" width="55" height="44" loading="lazy"><span>© Клуб лазертага «Клинский»</span></p>
     <p class="foot__links"><a href="about.html">О клубе</a><a href="privacy.html">Политика</a><a href="#top">Наверх ↑</a></p>
   </div>
 </footer>
 
-<script src="main.js?v=30"></script>
+<script src="main.js?v=33"></script>
 </body>
 </html>

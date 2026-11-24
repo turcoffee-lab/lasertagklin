@@ -36,8 +36,8 @@ ul,ol{list-style:none}
 
 /* ---------- шапка ---------- */
 .bar{position:fixed;inset:0 0 auto 0;z-index:50;height:60px;display:flex;align-items:center;gap:22px;padding:0 24px}
-/* фон шапки вынесен в ::before: backdrop-filter на самой шапке делал её контейнером для fixed-меню и ломал его размеры */
-.bar::before{content:"";position:absolute;inset:0;z-index:-1;background:rgba(5,8,6,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+/* фон шапки в ::before; размытие (backdrop-filter) убрано: оно перерисовывалось при каждой прокрутке и грузило видеокарту, поэтому фон почти непрозрачный */
+.bar::before{content:"";position:absolute;inset:0;z-index:-1;background:rgba(5,8,6,.94);border-bottom:1px solid var(--line)}
 .logo{display:flex;align-items:center;gap:10px;margin-right:auto}
 .logo__img{display:block;height:46px;width:auto;margin:-4px 0;filter:drop-shadow(0 0 8px rgba(var(--sig-rgb),.25))}
 .logo__t{font:700 20px/1 var(--f-d);letter-spacing:.04em;text-transform:uppercase}
@@ -46,6 +46,19 @@ ul,ol{list-style:none}
 .nav a{font:500 12px/1 var(--f-m);letter-spacing:.08em;white-space:nowrap;text-transform:uppercase;color:var(--dim);padding:6px 0;border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
 .nav a:hover,.nav a[aria-current="true"]{color:var(--ink);border-color:var(--sig)}
 .nav__cta{display:none}
+/* кнопка «Игра: вкл/выкл» (только на главной) */
+/* переключатель «Игра» (только на главной, в первом экране): дорожка с кружком, вкл. — кружок справа */
+.gtgl{display:inline-flex;align-items:center;gap:10px;height:32px;padding:0;background:none;border:0;color:var(--ink);font:500 11px/1 var(--f-m);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;cursor:pointer;pointer-events:auto;transition:color .2s}
+.gtgl__sw{position:relative;flex:none;width:44px;height:24px;border:1.5px solid var(--sig);border-radius:12px;transition:border-color .2s}
+.gtgl__sw::after{content:"";position:absolute;top:3px;left:3px;width:14px;height:14px;box-sizing:content-box;border:1.5px solid var(--sig);border-radius:50%;transform:translateX(20px);transition:transform .25s,border-color .2s,background-color .2s}
+.gtgl[aria-checked="true"] .gtgl__sw::after{background:var(--sig)}
+.gtgl[aria-checked="false"]{color:var(--dim)}
+.gtgl[aria-checked="false"] .gtgl__sw{border-color:var(--dim)}
+.gtgl[aria-checked="false"] .gtgl__sw::after{transform:none;border-color:var(--dim)}
+.gtgl:hover{color:var(--ink)}
+.gtgl:focus-visible{outline:2px solid var(--sig);outline-offset:4px;border-radius:12px}
+@media (prefers-reduced-motion:reduce){.gtgl__sw::after{transition:none}}
+.hero.game-off .hud{opacity:.35}
 .bar__p{position:absolute;left:0;bottom:-1px;height:2px;width:100%;background:var(--sig);transform-origin:0 50%;transform:scaleX(var(--p,0))}
 .burger{display:none;width:40px;height:40px;background:none;border:1px solid var(--line2);border-radius:var(--r);cursor:pointer;position:relative}
 .burger span{position:absolute;left:10px;right:10px;height:1.5px;background:var(--ink);transition:transform .25s,top .25s}
@@ -59,7 +72,7 @@ ul,ol{list-style:none}
 .hero__in,.hero__bot,.hud{position:relative;z-index:2;pointer-events:none}
 .hero::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(52% 62% at 80% 38%,rgba(var(--sig-rgb),.13),transparent 70%),radial-gradient(34% 40% at 88% 78%,rgba(var(--hot-rgb),.07),transparent 70%)}
 .hero__in{padding-top:clamp(36px,9vh,110px);position:relative}
-.hero__logo{position:absolute;right:-8px;top:clamp(0px,3vh,30px);width:min(47%,540px);height:auto;aspect-ratio:760/609;pointer-events:none;filter:drop-shadow(0 0 28px rgba(var(--sig-rgb),.18))}
+.hero__logo{position:absolute;right:-8px;top:clamp(0px,3vh,30px);width:min(47%,540px);height:auto;aspect-ratio:760/609;pointer-events:none;filter:drop-shadow(0 0 16px rgba(var(--sig-rgb),.18))}
 .hero__in .cta,.hero__in a{pointer-events:auto}
 .eyebrow{font:500 12px/1 var(--f-m);letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:22px}
 .eyebrow::before{content:"";display:inline-block;width:28px;height:1px;background:var(--sig);vertical-align:middle;margin-right:12px}
@@ -69,7 +82,8 @@ h1 i{font-style:normal;color:var(--sig)}
 .lead{max-width:44ch;margin-top:28px;font-size:clamp(1rem,1.6vw,1.2rem);color:#c9c7c1}
 .cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
 .hint{margin-top:22px;font:400 11px/1.5 var(--f-m);letter-spacing:.06em;color:var(--dim)}
-.hud{position:absolute;top:76px;left:24px;right:auto;display:flex;gap:22px;font-family:var(--f-m);text-align:left}
+.hudbar{position:absolute;top:70px;left:24px;z-index:2;display:flex;align-items:center;gap:22px}
+.hud{position:relative;display:flex;gap:22px;font-family:var(--f-m);text-align:left}
 .hud div{display:flex;flex-direction:column;gap:2px}
 .hud span{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
 .hud b{font:500 18px/1 var(--f-m);color:var(--ink)}
@@ -204,7 +218,8 @@ html.js .rv.in{opacity:1;transform:none}
   .nav__cta{display:block;color:var(--sig)!important}
 }
 @media (max-width:820px){
-  .hud{top:72px;left:16px;right:auto;gap:14px}
+  .hudbar{top:66px;left:16px;gap:14px}
+  .hud{gap:14px}
   .row{grid-template-columns:40px 1fr 44px 24px;grid-template-areas:"n t e i" ". s s s"}
   .row b{grid-area:n}.row strong{grid-area:t}.row span{grid-area:s}.row em{grid-area:e}.row i{grid-area:i}
   .chain{grid-template-columns:1fr;gap:0}
@@ -274,7 +289,7 @@ html.js .rv.in{opacity:1;transform:none}
 .gal .cap{position:absolute;left:8px;bottom:8px;z-index:3;padding:4px 7px;background:rgba(5,8,6,.72);font:400 10px/1.2 var(--f-m);letter-spacing:.1em;text-transform:uppercase;color:var(--ink);pointer-events:none}
 .gal .cap b{color:var(--sig);font-weight:500}
 .galw:not(.is-color) .gal img{filter:grayscale(1) contrast(1.15) brightness(.62)}
-.galw:not(.is-color) .gal a::after,.galw:not(.is-color) .gal a::before{opacity:1}
+.galw:not(.is-color) .gal a.is-lens::after,.galw:not(.is-color) .gal a.is-lens::before{opacity:1}   /* прицел рисуется только у кадра под курсором или пальцем */
 @media (hover:none),(pointer:coarse){
   .hint-fine{display:none}
   .hint-touch{display:inline}
@@ -408,7 +423,7 @@ body.noscroll{overflow:hidden}
 @media (max-width:980px){
   .hero__in{padding-top:clamp(28px,5vh,56px)}
   .hero__logo{position:static;display:block;width:min(74%,330px);margin:0 auto 14px}
-  .hud{top:68px}
+  .hudbar{top:62px}
 }
 @media (max-width:560px){.foot__in{align-items:flex-start}.foot__links{gap:14px}}
 
