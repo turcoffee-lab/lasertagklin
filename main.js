@@ -4,9 +4,9 @@
    2) 'send.php'                           — свой обработчик на хостинге с PHP (файл send.php из архива)
    3) 'https://api.web3forms.com/submit'   — сервис Web3Forms, нужен ключ в WEB3FORMS_KEY
    В режиме 2 адрес получателя задаётся в send.php (массив $CONFIG), в режиме 3 — при получении ключа на сайте Web3Forms. */
-const FORM_ENDPOINT = '';
-const FORM_EMAIL = 'info@your-domain.ru';  // ЗАМЕНИТЬ: показывается в сообщении об ошибке и используется в режиме 1
-const WEB3FORMS_KEY = '';                   // только для режима 3
+const FORM_ENDPOINT = 'https://api.web3forms.com/submit';
+const FORM_EMAIL = 'turkoff@yandex.ru';  // ЗАМЕНИТЬ: показывается в сообщении об ошибке и используется в режиме 1
+const WEB3FORMS_KEY = 'f2c195e6-dcc0-4c43-8a9e-ab43e4a9bcf8';                   // только для режима 3
 
 (function () {
   'use strict';
